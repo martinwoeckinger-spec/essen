@@ -35,7 +35,23 @@ beliebigen Webspace, Netlify, Vercel, GitHub Pages o.ä. geladen werden.
 `base: './'` in `vite.config.ts` sorgt dafür, dass die App auch in einem
 Unterordner funktioniert.
 
-## KI-Chat einrichten
+## Variante ohne API-Key: `artifact.html`
+
+Neben der vollen PWA gibt es **`artifact.html`** – die komplette App in einer
+einzigen Datei, ganz ohne Build-Schritt:
+
+- **Als Claude-Artefakt** (Inhalt der Datei in einen Claude-Chat geben): Der
+  KI-Chat läuft dann über die eingebaute Claude-Laufzeit (`window.claude.complete`)
+  – **kein API-Key nötig**.
+- **Standalone**: Datei einfach im Browser öffnen. Tracking, Makros, Grund-/
+  Sportumsatz und Auswertung funktionieren komplett ohne Key. Für den KI-Chat
+  kann optional ein Anthropic-Key im Profil hinterlegt werden.
+
+> Hinweis: In der Artefakt-Sandbox werden Daten ggf. nicht dauerhaft gespeichert
+> (kein persistenter `localStorage`). Standalone/als PWA bleiben die Daten lokal
+> erhalten.
+
+## KI-Chat einrichten (PWA-Variante)
 
 1. Anthropic-API-Key unter <https://console.anthropic.com> erstellen.
 2. In der App auf **Profil → KI-Chat** den Key eintragen und ein Modell wählen.
