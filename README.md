@@ -1,34 +1,49 @@
-# Essen 🍏 – Kalorientracker PWA
+# Essen 🍊 – Kalorien- & Makrotracker
 
-Ein mobiler Kalorien- und Makrotracker als **Progressive Web App**. Läuft komplett
-im Browser, funktioniert offline und lässt sich auf dem Handy zum Startbildschirm
-hinzufügen wie eine native App. Alle Daten bleiben lokal auf dem Gerät.
+Ein **Kalorien- und Makrotracker in einer einzigen HTML-Datei** – ohne
+Build-Schritt, ohne Server, ohne KI/API und ohne Konto. Einfach
+[`artifact.html`](artifact.html) im Browser öffnen. Alle Daten bleiben lokal auf
+dem Gerät (`localStorage`).
+
+Desktop-optimiert (Seitenleisten-Navigation, breites Layout, zweispaltige
+Tagesansicht), voll responsiv fürs Handy. Farbschema **Schwarz/Orange**.
+
+## Schnellstart
+
+- **Desktop/Handy:** `artifact.html` herunterladen und im Browser öffnen
+  (Doppelklick). Fertig – kein Setup.
+- Beim ersten Laden werden React/Babel einmalig über ein CDN geholt; danach
+  läuft alles lokal.
+
+> Zum Startbildschirm/Dock hinzufügen funktioniert wie bei jeder Webseite über
+> das Browser-Menü.
 
 ## Funktionen
 
-- **Strukturierter Import** – Nahrungsmittel als Tabelle (Tab- oder
-  `|`-getrennt) einfügen; **Datum und Mahlzeit werden automatisch zugeordnet**.
-  Mit Vorschau, Warnungen für fehlerhafte Zeilen und optionalem Leeren der
-  betroffenen Tage. Deutsche Zahlen (`0,4`) und Notizen mit Kommas inklusive.
-- **Tageserfassung nach Mahlzeiten** – Frühstück / Mittag / Abend / Snack,
-  je mit Zwischensumme; dazu Sport, mit Tagesnavigation
-- **Erweiterte Nährwerte** – zusätzlich zu kcal/Makros auch **Zucker,
-  gesättigte Fettsäuren, Ballaststoffe und Salz**, mit Ziel-/Limit-Balken
-- **Archiv** – alle erfassten Tage nach Monat gruppiert, antippen zum Öffnen,
-  Export zurück ins Tab-Format (Backup / Round-Trip)
-- **Analyse** – umschaltbarer **Zeitverlauf** (Kalorien, Makros, Ballaststoffe,
-  Zucker, Salz), erweiterte Durchschnitte, Verteilung nach Mahlzeit und
-  Tracking-Treue (erfasste Tage, Budget-Treue, Serie)
-- **Profil & Wünsche** – Körperdaten, Wunschgewicht inkl. Tempo-/Dauer­schätzung,
-  Ernährungsstil, Nährwert-Ziele/-Limits sowie Vorlieben/Hinweise
-- **KI-Chat** _(nur PWA)_ – natürlichsprachlich eintragen: _„Zum Frühstück 400 g
-  Joghurt mit Himbeeren"_ → Claude ordnet Mahlzeit zu, schätzt die Nährwerte und
-  trägt sie ein (Tool-Use), auch für andere Tage
-- **Grundumsatz** (Mifflin-St Jeor), **Erhaltungsbedarf** und **Sportumsatz**
-- **Vorschläge** _(nur PWA)_ – die KI schlägt Mahlzeiten für die fehlenden
-  Tageskalorien vor
+- **Erfassung per Copy & Paste** – Tabelle (Tab- oder `|`-getrennt) einfügen;
+  **Datum und Mahlzeit werden automatisch zugeordnet**. Mit Vorschau,
+  Duplikat-Warnung, „rückgängig" und optionalem Leeren der betroffenen Tage.
+  Dazu **Schnell-Einfügen** direkt auf „Heute" und **manuelle** Eingabe
+  (inkl. „Werte pro 100 g"-Umrechnung).
+- **Mahlzeiten** – Frühstück / Mittag / Abend / Snack mit Zwischensummen;
+  Einträge bearbeiten (✎), löschen (×) oder als **Favorit** (⭐) speichern.
+- **Favoriten** – häufige Lebensmittel mit einem Klick wieder hinzufügen.
+- **„Gestern übernehmen"** – den Vortag in einen Tag kopieren.
+- **Erweiterte Nährwerte** – kcal, Eiweiß/KH/Fett **plus** Zucker, gesättigte
+  Fettsäuren, Ballaststoffe und Salz, mit Ziel-/Limit-Balken und Makro-Donut.
+- **Gewicht** – pro Tag erfassen; Verlaufskurve und Bezug zum Wunschgewicht.
+- **Archiv** – alle Tage nach Monat, durchsuchbar; Export zurück ins Tab-Format.
+- **Analyse** – umschaltbarer **Zeitverlauf** (Kalorien/Makros/Ballaststoffe/
+  Zucker/Salz) mit 7-Tage-Schnitt, **Kalender-Heatmap**, **Gewichtsverlauf**,
+  **Kalorienbilanz** (geschätzte kg-Veränderung), Verteilung nach Mahlzeit und
+  Tracking-Treue (Budget-Treue, Serie).
+- **Profil & Wünsche** – Körperdaten, Wunschgewicht inkl. Tempo-/Dauerschätzung,
+  Ernährungsstil, Makro-Verteilung, Nährwert-Ziele/-Limits und persönliche
+  Hinweise.
+- **Backup** – komplette Daten als JSON sichern und wiederherstellen.
+- **Drucken** – aktuellen Tag als sauberen (hellen) Ausdruck/PDF.
 
-### Strukturierter Import – Spaltenformat
+### Import-Format
 
 Eine Zeile pro Lebensmittel, Spalten per **Tab** (oder `|`) getrennt:
 
@@ -36,73 +51,34 @@ Eine Zeile pro Lebensmittel, Spalten per **Tab** (oder `|`) getrennt:
 Datum  Mahlzeit  Nahrungsmittel  Menge  kcal  Eiweiß  KH  Zucker  Fett  ges.FS  Ballaststoffe  Salz  Notiz
 ```
 
-Beispiel:
+Beispiel (deutsche Kommazahlen und Notizen mit Kommas sind erlaubt):
 
 ```
 02.06.2026	Frühstück	Naturjoghurt	400 g	260	14	19	19	14	9	0	0,4	Vollmilchjoghurt 3,5%
 02.06.2026	Mittagessen	Chicken-Panade-Salat	1 Portion	550	35	30	5	30	6	5	1,5	Restaurantportion
 ```
 
-Aufrufbar über **„📋 Import"** auf der Heute- oder Archiv-Seite.
+Aufrufbar über **„📋 Import"** (mit Vorschau) oder **„⚡ Einfügen"** (direkt)
+auf der Heute-Seite.
 
-## Schnellstart
+## Tastenkürzel (Desktop)
 
-```bash
-npm install
-npm run generate-icons   # erzeugt die PWA-Icons (einmalig)
-npm run dev              # Entwicklung: http://localhost:5173
-```
+| Taste | Aktion |
+|------|--------|
+| `←` / `→` | Tag wechseln (auf „Heute") |
+| `t` | Zum heutigen Tag springen |
+| `i` | Import öffnen |
+| `Esc` | Dialog schließen |
 
-### Build & Deploy (statisch)
+## Datensicherung
 
-```bash
-npm run build            # Ergebnis liegt in dist/
-npm run preview          # gebauten Stand lokal testen
-```
+Alle Daten liegen ausschließlich im `localStorage` deines Browsers. Lade unter
+**Profil → 💾 Daten & Sicherung** regelmäßig ein **JSON-Backup** herunter, damit
+beim Leeren des Browser-Speichers nichts verloren geht. Über denselben Bereich
+lässt sich ein Backup wieder einspielen.
 
-Der Inhalt von `dist/` ist eine rein statische Seite und kann auf jeden
-beliebigen Webspace, Netlify, Vercel, GitHub Pages o.ä. geladen werden.
-`base: './'` in `vite.config.ts` sorgt dafür, dass die App auch in einem
-Unterordner funktioniert.
+## Technik & Datenschutz
 
-## Single-File-Variante ohne KI: `artifact.html`
-
-Neben der vollen PWA gibt es **`artifact.html`** – ein **reiner Offline-Tracker
-in einer einzigen Datei**, ganz ohne Build-Schritt und **ohne KI/API**. Die
-Erfassung der Mahlzeiten erfolgt per **Copy & Paste** (strukturierter Import)
-oder manuell; dazu Mahlzeiten-Gruppierung, erweiterte Nährwerte, Archiv,
-Analysen und Profil.
-
-> **Desktop-optimiert:** Auf breiten Bildschirmen erscheint eine
-> Seitenleisten-Navigation, ein breites Layout und eine zweispaltige
-> Tagesansicht (Dialoge als zentrierte Modals); auf dem Handy bleibt die untere
-> Tableiste. Farbschema: **Schwarz/Orange**.
-
-- **Kein API-Key, kein KI-Chat, keine automatischen Vorschläge** – einfach die
-  Datei im Browser öffnen.
-- Lediglich React/Babel werden beim ersten Laden per CDN geholt; alle Daten
-  bleiben lokal im Browser (`localStorage`).
-
-> KI-Chat und automatische Mahlzeit-Vorschläge gibt es nur in der **PWA**
-> (mit eigenem Anthropic-API-Key, siehe unten).
-
-## KI-Chat einrichten (PWA-Variante)
-
-1. Anthropic-API-Key unter <https://console.anthropic.com> erstellen.
-2. In der App auf **Profil → KI-Chat** den Key eintragen und ein Modell wählen.
-
-Der Key wird **nur lokal** im Browser (LocalStorage) gespeichert und direkt von
-deinem Gerät an die Anthropic-API gesendet – es gibt keinen eigenen Server.
-
-> Hinweis: Direkte Browser-Aufrufe der API sind über die SDK-Option
-> `dangerouslyAllowBrowser` aktiviert. Das ist für eine private App auf dem
-> eigenen Gerät vorgesehen; teile deinen Key nicht öffentlich.
-
-## Aufs Handy installieren
-
-Seite im mobilen Browser öffnen → Teilen/Menü → **Zum Startbildschirm hinzufügen**.
-
-## Technik
-
-Vite · React · TypeScript · zustand (lokale Persistenz) · vite-plugin-pwa ·
-`@anthropic-ai/sdk`. Berechnungen siehe `src/lib/calc.ts`.
+- Eine Datei, reines Frontend: React 18 + Babel-Standalone (per CDN), kein Build.
+- Keine Server-Kommunikation, **keine KI/API**, kein Tracking.
+- Persistenz lokal über `localStorage`; Export/Backup als TSV bzw. JSON.

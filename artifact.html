@@ -14,8 +14,10 @@
     --accent:#f97316;--accent2:#fb923c;--danger:#ef4444;--track:#2c2c2c;
     --protein:#34d399;--carbs:#38bdf8;--fat:#c084fc;--radius:14px;
     --fiber:#a3e635;--sugar:#f472b6;--satfat:#fb7185;--salt:#94a3b8;--data:#60a5fa;
+    --good:#22c55e;
     --safe-bottom:env(safe-area-inset-bottom,0px);--safe-top:env(safe-area-inset-top,0px);
   }
+  html{color-scheme:dark}
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body,#root{height:100%;margin:0}
   body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:16px}
@@ -30,9 +32,12 @@
   .card{background:var(--card);border-radius:var(--radius);padding:16px}
   .card-title{margin:0 0 12px;font-size:15px;font-weight:700}
   .datebar{display:flex;align-items:center;justify-content:space-between;gap:8px}
-  .datebar-label{font-size:20px;font-weight:800}
+  .datebar-label{font-size:20px;font-weight:800;background:none;border:none;color:var(--text);cursor:pointer;padding:6px 10px;border-radius:10px}
+  .datebar-label:hover{background:var(--card2)}
+  .date-input{width:auto;max-width:200px;background:var(--card2);border:1px solid var(--track);color:var(--text);border-radius:10px;padding:8px 10px;font-weight:700;text-align:center}
   .nav-btn{width:40px;height:40px;border-radius:12px;border:none;background:var(--card2);color:var(--text);font-size:22px;cursor:pointer}
   .nav-btn:disabled{opacity:.3}
+  .toolbar{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
   .hero{display:flex;flex-direction:column;align-items:center;gap:16px}
   .ring-wrap{position:relative;width:200px;height:200px}
   .ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
@@ -46,13 +51,16 @@
   .macro-label{font-weight:600}.macro-num{font-weight:700}
   .bar{height:9px;background:var(--track);border-radius:99px;overflow:hidden}
   .bar-fill{height:100%;border-radius:99px;transition:width .3s}
+  .macro-top{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+  .macro-top .bars{flex:1;min-width:190px}
+  .donut-wrap{position:relative;display:flex;align-items:center;justify-content:center}
+  .donut-center{position:absolute;text-align:center;line-height:1.1}
+  .donut-center b{font-size:20px}.donut-center .muted{font-size:11px}
   .energy-row{display:flex;justify-content:space-between;padding:7px 0;font-size:14px;color:var(--muted);border-bottom:1px solid #0b122033}
   .energy-row strong{color:var(--text)}
   .energy-row.total{border-bottom:none;font-size:16px;color:var(--text);padding-top:12px}
   .energy-row.total strong{color:var(--accent2)}
-  .suggest-btn{width:100%;padding:14px;border-radius:var(--radius);border:none;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:700;font-size:15px;cursor:pointer}
-  .suggest-btn:disabled{background:var(--card2);color:var(--muted)}
-  .section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px;flex-wrap:wrap}
   .section-head .card-title{margin:0}.section-actions{display:flex;gap:6px;flex-wrap:wrap}
   .chip{background:var(--card2);border:none;color:var(--text);padding:6px 10px;border-radius:99px;font-size:13px;font-weight:600;cursor:pointer}
   .empty{color:var(--muted);font-size:14px;margin:6px 0 0}
@@ -61,7 +69,11 @@
   .entry-main{flex:1;min-width:0}.entry-name{font-weight:600;display:block}
   .entry-qty{font-size:12px;color:var(--accent2)}.entry-macros{display:block;font-size:12px;color:var(--muted)}
   .entry-kcal{font-weight:800;font-variant-numeric:tabular-nums}.entry-kcal.burn{color:var(--accent2)}
+  .entry-actions{display:flex;align-items:center;gap:2px}
   .del{width:28px;height:28px;border-radius:8px;border:none;background:transparent;color:var(--muted);font-size:20px;cursor:pointer}
+  .icon-btn{width:30px;height:30px;border-radius:8px;border:none;background:transparent;color:var(--muted);cursor:pointer;font-size:14px}
+  .icon-btn:hover,.del:hover{color:var(--accent2);background:var(--card2)}
+  .del:hover{color:var(--danger)}
   .form{display:flex;flex-direction:column;gap:8px;margin:6px 0 12px}
   .form-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
   .form-grid.two{grid-template-columns:repeat(2,1fr)}
@@ -70,40 +82,24 @@
   textarea{background:var(--bg);border:1px solid var(--track);color:var(--text);border-radius:10px;padding:11px 12px;width:100%;outline:none;resize:vertical;font-size:15px}
   textarea:focus{border-color:var(--accent2)}
   .primary{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:12px;font-weight:700;cursor:pointer}
-  .chat-page{height:100%;padding-bottom:0}
-  .chat-head{display:flex;justify-content:space-between;align-items:center}.chat-head h2{margin:0;font-size:22px}
-  .messages{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:4px 2px}
-  .msg{max-width:85%;padding:10px 13px;border-radius:16px;font-size:15px;line-height:1.4;white-space:pre-wrap;word-wrap:break-word}
-  .msg.user{align-self:flex-end;background:var(--accent);color:#fff;border-bottom-right-radius:4px}
-  .msg.assistant{align-self:flex-start;background:var(--card);border-bottom-left-radius:4px}
-  .msg.typing{display:flex;gap:4px}
-  .dot{width:7px;height:7px;border-radius:50%;background:var(--muted);animation:blink 1.2s infinite}
-  .dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
-  @keyframes blink{0%,60%,100%{opacity:.3}30%{opacity:1}}
-  .chat-intro{color:var(--muted);font-size:14px}
-  .examples{display:flex;flex-direction:column;gap:8px;margin-top:12px}
-  .example{text-align:left;background:var(--card);border:1px solid var(--track);color:var(--text);padding:11px 13px;border-radius:12px;cursor:pointer;font-size:14px}
-  .composer{display:flex;gap:8px;padding:10px 2px calc(var(--safe-bottom) + 10px)}
-  .composer input{flex:1}
-  .send{width:48px;border:none;border-radius:12px;background:var(--accent);color:#fff;font-size:18px;cursor:pointer}
-  .send:disabled{opacity:.4}
-  .banner{padding:12px;border-radius:12px;font-size:14px}
-  .banner.ok{background:#052e16;color:#86efac}.banner.warn{background:#422006;color:#fde68a}
-  .error{background:#450a0a;color:#fecaca;padding:10px 12px;border-radius:12px;font-size:13px}
+  .chat-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}.chat-head h2{margin:0;font-size:22px}
   .seg{display:flex;gap:4px;background:var(--card2);padding:3px;border-radius:10px}
   .seg button{background:none;border:none;color:var(--muted);padding:6px 10px;border-radius:8px;font-weight:600;cursor:pointer}
   .seg button.on{background:var(--accent);color:#fff}.seg.full{width:100%}.seg.full button{flex:1}
-  .chart{display:flex;align-items:flex-end;gap:4px;height:160px;padding-top:8px}
+  .chart{position:relative;display:flex;align-items:flex-end;gap:4px;height:160px;padding-top:8px}
   .chart-col{flex:1;display:flex;flex-direction:column;align-items:center;height:100%}
   .chart-bar-wrap{position:relative;flex:1;width:100%;display:flex;align-items:flex-end;justify-content:center}
   .chart-bar{width:70%;background:var(--data);border-radius:4px 4px 0 0;min-height:2px;transition:height .3s}
   .chart-bar.over{background:var(--danger)}
   .budget-line{position:absolute;left:0;right:0;height:2px;background:var(--muted);opacity:.6}
   .chart-label{font-size:10px;color:var(--muted);margin-top:4px}
-  .chart-legend{display:flex;gap:14px;justify-content:center;margin-top:12px;font-size:12px;color:var(--muted)}
+  .chart-avg{position:absolute;left:0;right:0;top:8px;bottom:20px;pointer-events:none;width:100%;height:auto}
+  .chart-legend{display:flex;gap:14px;justify-content:center;margin-top:12px;font-size:12px;color:var(--muted);flex-wrap:wrap}
   .chart-legend span{display:flex;align-items:center;gap:5px}
   .sw{width:12px;height:12px;border-radius:3px;display:inline-block}
   .sw.accent{background:var(--data)}.sw.danger{background:var(--danger)}.sw.line{background:var(--muted);height:3px;border-radius:2px}
+  .sw.avgline{background:var(--text);height:2px;border-radius:2px}
+  .linechart{width:100%;display:block}
   .avg-row{display:flex;justify-content:space-between;font-size:16px}.avg-row strong{color:var(--accent2)}
   .field{margin-bottom:12px}.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px;font-weight:600}
   .field-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
@@ -119,7 +115,6 @@
   .pct input[type=range]{width:100%;accent-color:var(--accent)}
   .footer-note{text-align:center;color:var(--muted);font-size:12px;padding:0 12px}
   .muted{color:var(--muted)}.small{font-size:12px}.warn{color:var(--protein)}.over{color:var(--danger)}
-  /* Mahlzeit-Gruppen */
   .meal-group{margin-top:12px}
   .meal-head{display:flex;justify-content:space-between;align-items:center;border-top:1px solid #0b122044;padding-top:10px}
   .meal-title{font-size:14px;font-weight:700}
@@ -130,7 +125,13 @@
   .mini-field input{padding:9px 8px;text-align:center}
   .warn-tag{color:var(--danger)}
   .pref-text{line-height:1.4}
-  /* Overlay / Import */
+  .fav-list{display:flex;flex-direction:column;gap:6px;margin:8px 0 4px}
+  .fav-item{display:flex;align-items:center;gap:8px}
+  .fav-add{flex:1;display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--card2);border:none;color:var(--text);border-radius:10px;padding:9px 12px;cursor:pointer;text-align:left;min-width:0}
+  .fav-name{font-weight:600}
+  .fav-sub{font-size:12px;color:var(--muted)}
+  .weight-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .weight-row input{max-width:130px}
   .overlay{position:fixed;inset:0;z-index:50;background:var(--bg);max-width:560px;margin:0 auto;display:flex;flex-direction:column}
   .overlay-head{display:flex;align-items:center;justify-content:space-between;padding:calc(var(--safe-top) + 12px) 14px 10px;border-bottom:1px solid #0b1220}
   .overlay-head h2{margin:0;font-size:18px}
@@ -147,11 +148,9 @@
   .preview-meal-head{font-size:13px;font-weight:700;color:var(--accent2);margin:6px 0 2px}
   .preview-row{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:3px 0}
   .preview-name{min-width:0}.preview-kcal{color:var(--muted);white-space:nowrap}
-  /* Metrik-Chips */
   .metric-chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:10px;-webkit-overflow-scrolling:touch}
   .metric-chip{flex:none;background:var(--card2);border:none;color:var(--muted);padding:6px 12px;border-radius:99px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
   .metric-chip.on{background:var(--accent);color:#fff}
-  /* Archiv */
   .month-head{font-size:12px;color:var(--muted);font-weight:700;margin:6px 2px 8px;text-transform:uppercase;letter-spacing:.04em}
   .archive-card{padding:4px 16px}
   .archive-list{list-style:none;margin:0;padding:0}
@@ -162,18 +161,20 @@
   .archive-wd{font-size:11px;color:var(--muted)}.archive-label{font-weight:700}
   .archive-meta{flex:1;min-width:0}
   .archive-kcal{font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
-  /* ---------- Brand / Layout-Bausteine ---------- */
+  .heatmap{display:flex;flex-direction:column;gap:3px}
+  .heat-week{display:flex;gap:3px}
+  .heat-cell{flex:1;aspect-ratio:1;border-radius:3px;background:var(--card2);cursor:pointer;border:none;min-width:0;min-height:13px}
+  .heat-legend{display:flex;gap:12px;align-items:center;font-size:11px;color:var(--muted);margin-top:8px;flex-wrap:wrap}
+  .toast{position:fixed;left:50%;bottom:calc(var(--safe-bottom) + 72px);transform:translateX(-50%);background:var(--card2);color:var(--text);padding:10px 16px;border-radius:99px;font-size:14px;font-weight:600;z-index:80;box-shadow:0 8px 24px rgba(0,0,0,.45)}
   .brand{display:none}
   .cols{display:flex;flex-direction:column;gap:14px}
   .col{display:flex;flex-direction:column;gap:14px;min-width:0}
   .overlay-card{display:flex;flex-direction:column;flex:1;min-height:0}
   @media (hover:hover){
-    .chip:hover,.preset:hover,.nav-btn:hover,.metric-chip:hover,.seg button:hover{filter:brightness(1.18)}
+    .chip:hover,.preset:hover,.nav-btn:hover,.metric-chip:hover,.seg button:hover,.fav-add:hover{filter:brightness(1.18)}
     .primary:hover{filter:brightness(1.08)}
-    .del:hover{color:var(--danger)}
     .archive-open:hover{background:var(--card2)}
   }
-  /* ---------- Desktop ---------- */
   @media (min-width:900px){
     body{font-size:15px}
     .app{flex-direction:row;max-width:1180px;height:100vh}
@@ -181,22 +182,30 @@
     .brand{display:flex;align-items:center;gap:10px;padding:4px 12px 18px;font-weight:800;font-size:20px}
     .brand-icon{font-size:24px}
     .tab{flex:none;flex-direction:row;justify-content:flex-start;gap:12px;padding:11px 14px;border-radius:12px}
-    .tab-icon{font-size:20px}
-    .tab-label{font-size:14px;font-weight:600}
+    .tab-icon{font-size:20px}.tab-label{font-size:14px;font-weight:600}
     .tab.active{background:var(--card);color:var(--accent2)}
     .page{max-width:880px;margin:0 auto;padding:28px 28px 44px}
     .page-today{max-width:1060px}
     .page-today .cols{display:grid;grid-template-columns:340px 1fr;gap:18px;align-items:start}
     .datebar-label{font-size:22px}
+    .toast{bottom:24px}
     .overlay{align-items:flex-start;justify-content:center;background:rgba(0,0,0,.65);max-width:none;margin:0;padding:48px 16px}
     .overlay-card{flex:none;width:100%;max-width:760px;max-height:84vh;background:var(--bg2);border:1px solid var(--card2);border-radius:16px;overflow:hidden}
-    .overlay-head{padding:16px 18px}
-    .overlay-body{padding:16px 18px 24px}
+    .overlay-head{padding:16px 18px}.overlay-body{padding:16px 18px 24px}
   }
   @media (min-width:1280px){
-    .app{max-width:1320px}
-    .page-today{max-width:1160px}
+    .app{max-width:1320px}.page-today{max-width:1160px}
     .page-today .cols{grid-template-columns:360px 1fr}
+  }
+  @media print{
+    :root{--bg:#fff;--bg2:#fff;--card:#fff;--card2:#f1f1f1;--text:#111;--muted:#555;--track:#ddd}
+    html,body{background:#fff}
+    .tabbar,.overlay,.toolbar,.section-actions,.nav-btn,.del,.icon-btn,.metric-chips,.toast{display:none!important}
+    .app{display:block;max-width:none;height:auto}
+    .content{overflow:visible;height:auto}
+    .page{max-width:none;padding:0}
+    .page-today .cols{display:block}
+    .card{border:1px solid #ddd;break-inside:avoid;margin-bottom:10px}
   }
 </style>
 </head>
@@ -260,6 +269,7 @@ const monthLabel = k=>{const[y,m]=k.split('-').map(Number);return new Date(y,m-1
 const fullDate = k=>{const[y,m,d]=k.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long',year:'numeric'});};
 const isoAt = (k,h,min=0)=>{const[y,m,d]=k.split('-').map(Number);return new Date(y,m-1,d,h,min).toISOString();};
 const timeLabel = iso=>{try{return new Date(iso).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});}catch(e){return'';}};
+const getMonday = k=>{const[y,m,d]=k.split('-').map(Number);const dow=(new Date(y,m-1,d).getDay()+6)%7;return addDays(k,-dow);};
 const uid = ()=> (crypto?.randomUUID?.() || Math.random().toString(36).slice(2));
 
 /* ---------- Strukturierter Import ---------- */
@@ -319,11 +329,11 @@ const IMPORT_EXAMPLE=[
   '02.06.2026\tSnack\tWhey-Pulver mit Wasser\t1 Portion (~30 g)\t115\t24\t3\t2\t2\t1\t0\t0,2\t1 Scoop 30 g, in Wasser',
 ].join('\n');
 
-/* ---------- Persistenz (mit Migration alter Daten) ---------- */
+/* ---------- Persistenz ---------- */
 const DEFAULTS = {
   profile:{name:'',sex:'male',age:30,height:180,weight:80,targetWeight:null,activity:'light'},
   goal:{adjustment:0,proteinPct:30,carbsPct:40,fatPct:30,addExercise:true,dietStyle:'omnivore',fiberGoal:30,sugarLimit:50,saltLimit:6,satFatLimit:20,preferences:''},
-  days:{},
+  days:{},favorites:[],weights:{},
 };
 function migrateDays(days){
   const out={};
@@ -333,43 +343,58 @@ function migrateDays(days){
   });
   return out;
 }
-function load(){
-  try{
-    const s=localStorage.getItem('essen-artifact');
-    if(s){
-      const p=JSON.parse(s);
-      return {
-        profile:{...DEFAULTS.profile,...(p.profile||{})},
-        goal:{...DEFAULTS.goal,...(p.goal||{})},
-        days:migrateDays(p.days),
-      };
-    }
-  }catch(e){}
-  return DEFAULTS;
+function normalizeState(p){
+  p=p||{};
+  return {
+    profile:{...DEFAULTS.profile,...(p.profile||{})},
+    goal:{...DEFAULTS.goal,...(p.goal||{})},
+    days:migrateDays(p.days),
+    favorites:Array.isArray(p.favorites)?p.favorites:[],
+    weights:(p.weights&&typeof p.weights==='object')?p.weights:{},
+  };
 }
+function load(){ try{const s=localStorage.getItem('essen-artifact');if(s)return normalizeState(JSON.parse(s));}catch(e){} return JSON.parse(JSON.stringify(DEFAULTS)); }
 function save(s){ try{localStorage.setItem('essen-artifact',JSON.stringify(s));}catch(e){} }
 
 /* ---------- State-Helfer ---------- */
 function addFoodTo(setState,date,food){
   setState(s=>{const d=s.days[date]||{date,foods:[],exercises:[]};return{...s,days:{...s.days,[date]:{...d,foods:[...d.foods,{...food,id:uid(),time:food.time||new Date().toISOString()}]}}};});
 }
+function updateFood(setState,date,id,patch){
+  setState(s=>{const d=s.days[date];if(!d)return s;return{...s,days:{...s.days,[date]:{...d,foods:d.foods.map(f=>f.id===id?{...f,...patch}:f)}}};});
+}
 function addExTo(setState,date,ex){
   setState(s=>{const d=s.days[date]||{date,foods:[],exercises:[]};return{...s,days:{...s.days,[date]:{...d,exercises:[...d.exercises,{...ex,id:uid(),time:new Date().toISOString()}]}}};});
 }
 function importEntries(setState,rows,replace){
+  const seq={};
+  const built=rows.map(r=>{const i=seq[r.date]=(seq[r.date]||0)+1;
+    return {date:r.date,entry:{id:uid(),name:r.name,meal:r.meal,quantity:r.quantity,calories:Math.round(r.calories),protein:Math.round(r.protein),carbs:Math.round(r.carbs),sugar:Math.round(r.sugar),fat:Math.round(r.fat),saturatedFat:Math.round(r.saturatedFat),fiber:Math.round(r.fiber),salt:Math.round(r.salt*10)/10,note:r.note,source:'import',time:isoAt(r.date,MEALS[r.meal].hour,i)}};});
   setState(s=>{
     const days={...s.days};
     if(replace){[...new Set(rows.map(r=>r.date))].forEach(dt=>{const d=days[dt]||{date:dt,foods:[],exercises:[]};days[dt]={...d,foods:[]};});}
-    const seq={};
-    rows.forEach(r=>{
-      const d=days[r.date]||{date:r.date,foods:[],exercises:[]};
-      const i=seq[r.date]=(seq[r.date]||0)+1;
-      const e={id:uid(),name:r.name,meal:r.meal,quantity:r.quantity,calories:Math.round(r.calories),protein:Math.round(r.protein),carbs:Math.round(r.carbs),sugar:Math.round(r.sugar),fat:Math.round(r.fat),saturatedFat:Math.round(r.saturatedFat),fiber:Math.round(r.fiber),salt:Math.round(r.salt*10)/10,note:r.note,source:'import',time:isoAt(r.date,MEALS[r.meal].hour,i)};
-      days[r.date]={...d,foods:[...d.foods,e]};
-    });
+    built.forEach(({date,entry})=>{const d=days[date]||{date,foods:[],exercises:[]};days[date]={...d,foods:[...d.foods,entry]};});
     return {...s,days};
   });
+  return built.map(b=>({date:b.date,id:b.entry.id}));
 }
+function removeRefs(setState,refs){
+  setState(s=>{const days={...s.days};const by={};refs.forEach(r=>{(by[r.date]=by[r.date]||new Set()).add(r.id);});Object.keys(by).forEach(dt=>{const d=days[dt];if(d)days[dt]={...d,foods:d.foods.filter(f=>!by[dt].has(f.id))};});return{...s,days};});
+}
+function copyDay(setState,from,to){
+  setState(s=>{const src=s.days[from];if(!src||!src.foods.length)return s;const seq={};
+    const add=src.foods.map(f=>{const i=seq[to]=(seq[to]||0)+1;return {...f,id:uid(),time:isoAt(to,(MEALS[f.meal]||MEALS.snack).hour,i),source:'manual'};});
+    const d=s.days[to]||{date:to,foods:[],exercises:[]};return {...s,days:{...s.days,[to]:{...d,foods:[...d.foods,...add]}}};});
+}
+function setWeight(setState,date,kg){
+  setState(s=>{const weights={...s.weights};
+    if(kg==null||isNaN(kg)||kg<=0)delete weights[date];else weights[date]=Math.round(kg*10)/10;
+    const keys=Object.keys(weights).sort();const latest=keys.length?weights[keys[keys.length-1]]:s.profile.weight;
+    return {...s,weights,profile:{...s.profile,weight:latest}};});
+}
+const favFrom = f => ({name:f.name,meal:f.meal,quantity:f.quantity,calories:f.calories,protein:f.protein,carbs:f.carbs,sugar:f.sugar,fat:f.fat,saturatedFat:f.saturatedFat,fiber:f.fiber,salt:f.salt,note:f.note});
+function addFavorite(setState,fav){setState(s=>{if(s.favorites.some(x=>x.name===fav.name&&(x.quantity||'')===(fav.quantity||'')))return s;return {...s,favorites:[...s.favorites,{...fav,id:uid()}]};});}
+function removeFavorite(setState,id){setState(s=>({...s,favorites:s.favorites.filter(f=>f.id!==id)}));}
 
 /* ---------- UI-Bausteine ---------- */
 function Ring({consumed,budget}){
@@ -399,19 +424,73 @@ const MacroBar=({label,value,target,color,unit='g',limit=false})=>{
     </div>
   );
 };
-const DayBars=({data,unit='',color='var(--data)'})=>{
-  const max=Math.max(...data.map(d=>Math.max(d.value,d.ref||0)),1);
-  return (<div className="chart">{data.map(d=>{
-    const h=(d.value/max)*100, refH=d.ref!=null?(d.ref/max)*100:null;
-    return (
-      <div className="chart-col" key={d.key} title={`${d.key}: ${d.value}${unit}`}>
-        <div className="chart-bar-wrap">
-          {refH!=null&&<div className="budget-line" style={{bottom:Math.min(refH,100)+'%'}}/>}
-          <div className={'chart-bar'+(d.over?' over':'')} style={{height:Math.min(h,100)+'%',background:d.over?undefined:color}}/>
-        </div>
-        <div className="chart-label">{d.key.slice(8)}</div>
-      </div>);})}</div>);
+function Donut({segments,size=116,stroke=16,center}){
+  const r=(size-stroke)/2,c=2*Math.PI*r; const total=segments.reduce((a,s)=>a+s.value,0)||1; let acc=0;
+  return (<div className="donut-wrap" style={{width:size,height:size}}>
+    <svg width={size} height={size}>
+      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="var(--track)" strokeWidth={stroke}/>
+      {segments.map((s,i)=>{const dash=(s.value/total)*c;const el=<circle key={i} cx={size/2} cy={size/2} r={r} fill="none" stroke={s.color} strokeWidth={stroke} strokeDasharray={`${dash} ${c-dash}`} strokeDashoffset={-acc} transform={`rotate(-90 ${size/2} ${size/2})`}/>;acc+=dash;return el;})}
+    </svg>
+    {center!=null&&<div className="donut-center">{center}</div>}
+  </div>);
+}
+const DayBars=({data,unit='',color='var(--data)',avg})=>{
+  const vals=avg?avg.filter(v=>v!=null):[];
+  const max=Math.max(...data.map(d=>Math.max(d.value,d.ref||0)),...vals,1);
+  const n=data.length;
+  let poly=null;
+  if(avg){const pts=avg.map((v,i)=>v==null?null:`${((i+0.5)/n*100).toFixed(2)},${(100-(v/max)*100).toFixed(2)}`).filter(Boolean);if(pts.length>=2)poly=pts.join(' ');}
+  return (<div className="chart">
+    {data.map(d=>{
+      const h=(d.value/max)*100, refH=d.ref!=null?(d.ref/max)*100:null;
+      return (
+        <div className="chart-col" key={d.key} title={`${d.key}: ${d.value}${unit}`}>
+          <div className="chart-bar-wrap">
+            {refH!=null&&<div className="budget-line" style={{bottom:Math.min(refH,100)+'%'}}/>}
+            <div className={'chart-bar'+(d.over?' over':'')} style={{height:Math.min(h,100)+'%',background:d.over?undefined:color}}/>
+          </div>
+          <div className="chart-label">{d.key.slice(8)}</div>
+        </div>);})}
+    {poly&&<svg className="chart-avg" viewBox="0 0 100 100" preserveAspectRatio="none"><polyline points={poly} fill="none" stroke="var(--text)" strokeWidth="1.5" opacity="0.8" vectorEffect="non-scaling-stroke"/></svg>}
+  </div>);
 };
+function LineChart({points,target,unit='kg',height=150}){
+  const vals=points.map(p=>p.value).filter(v=>v!=null);
+  if(!vals.length)return null;
+  const extra=target!=null?[+target]:[];
+  let lo=Math.min(...vals,...extra),hi=Math.max(...vals,...extra);
+  if(lo===hi){lo-=1;hi+=1;}
+  const pad=(hi-lo)*0.15;lo-=pad;hi+=pad;
+  const W=1000,H=300,n=points.length;
+  const X=i=>n<=1?W/2:i/(n-1)*W;
+  const Y=v=>H-(v-lo)/(hi-lo)*H;
+  const seg=points.map((p,i)=>p.value!=null?`${X(i).toFixed(1)},${Y(p.value).toFixed(1)}`:null).filter(Boolean).join(' ');
+  const ty=target!=null?Y(+target):null;
+  return (<div>
+    <svg className="linechart" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" style={{height}}>
+      {ty!=null&&ty>=0&&ty<=H&&<line x1="0" y1={ty} x2={W} y2={ty} stroke="var(--accent)" strokeWidth="2" strokeDasharray="8 8" vectorEffect="non-scaling-stroke"/>}
+      {seg&&<polyline points={seg} fill="none" stroke="var(--accent2)" strokeWidth="2.5" strokeLinejoin="round" vectorEffect="non-scaling-stroke"/>}
+      {points.map((p,i)=>p.value!=null?<circle key={i} cx={X(i)} cy={Y(p.value)} r="5" fill="var(--accent2)"/>:null)}
+    </svg>
+    <div className="chart-legend">
+      <span>min {Math.round(Math.min(...vals)*10)/10} {unit}</span>
+      <span>max {Math.round(Math.max(...vals)*10)/10} {unit}</span>
+      {target!=null&&<span><i className="sw" style={{background:'var(--accent)'}}/> Ziel {target} {unit}</span>}
+    </div>
+  </div>);
+}
+function Heatmap({days,profile,goal,onPick,weeks=9}){
+  const today=todayKey();
+  const startMon=getMonday(addDays(today,-7*(weeks-1)));
+  const wd=['Mo','Di','Mi','Do','Fr','Sa','So'];
+  const grid=[]; for(let w=0;w<weeks;w++){const row=[];for(let d=0;d<7;d++)row.push(addDays(startMon,w*7+d));grid.push(row);}
+  const color=k=>{const day=days[k];if(!day||!day.foods.length)return 'var(--card2)';const burned=Math.round(day.exercises.reduce((a,e)=>a+(+e.calories||0),0));const budget=dailyBudget(profile,goal,burned);return sumCal(day.foods)<=budget?'var(--good)':'var(--danger)';};
+  return (<div style={{maxWidth:300}}>
+    <div className="heat-week" style={{marginBottom:4}}>{wd.map(x=><div key={x} className="muted small" style={{flex:1,textAlign:'center'}}>{x}</div>)}</div>
+    <div className="heatmap">{grid.map((row,wi)=>(<div className="heat-week" key={wi}>{row.map(k=>{const fut=k>today;return <button key={k} className="heat-cell" disabled={fut||!(days[k]&&days[k].foods.length)} title={k+(days[k]&&days[k].foods.length?(' · '+sumCal(days[k].foods)+' kcal'):' · –')} style={{background:fut?'transparent':color(k),visibility:fut?'hidden':'visible'}} onClick={()=>onPick(k)}/>;})}</div>))}</div>
+    <div className="heat-legend"><span><i className="sw" style={{background:'var(--good)'}}/> im Budget</span><span><i className="sw" style={{background:'var(--danger)'}}/> drüber</span><span><i className="sw" style={{background:'var(--card2)'}}/> nicht erfasst</span></div>
+  </div>);
+}
 const Stat=({label,value,sub})=>(<div className="stat"><div className="stat-value">{value}</div><div className="stat-label">{label}</div>{sub&&<div className="stat-sub">{sub}</div>}</div>);
 const Overlay=({title,onClose,children})=>(
   <div className="overlay" onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
@@ -422,32 +501,29 @@ const Overlay=({title,onClose,children})=>(
   </div>);
 
 /* ---------- Import-Overlay ---------- */
-function ImportPanel({setState,setDate,onClose}){
+function ImportPanel({state,setState,setDate,onClose}){
   const [text,setText]=useState('');
   const [replace,setReplace]=useState(false);
   const [done,setDone]=useState(null);
   const result=useMemo(()=>parseStructured(text),[text]);
   const totals=useMemo(()=>sumParsed(result.rows),[result.rows]);
-  const byDate=useMemo(()=>{
-    const map=new Map();
-    result.rows.forEach(r=>{if(!map.has(r.date))map.set(r.date,[]);map.get(r.date).push(r);});
-    return [...map.entries()].sort((a,b)=>a[0].localeCompare(b[0]));
-  },[result.rows]);
+  const dupCount=useMemo(()=>result.rows.filter(r=>(state.days[r.date]&&state.days[r.date].foods||[]).some(f=>f.name===r.name&&f.meal===r.meal&&Math.round(f.calories)===Math.round(r.calories))).length,[result.rows,state.days]);
+  const byDate=useMemo(()=>{const map=new Map();result.rows.forEach(r=>{if(!map.has(r.date))map.set(r.date,[]);map.get(r.date).push(r);});return [...map.entries()].sort((a,b)=>a[0].localeCompare(b[0]));},[result.rows]);
 
   function doImport(){
     if(!result.rows.length)return;
-    importEntries(setState,result.rows,replace);
-    const first=[...new Set(result.rows.map(r=>r.date))].sort()[0];
-    if(first)setDate(first);
-    setDone({added:result.rows.length,days:new Set(result.rows.map(r=>r.date)).size});
+    const refs=importEntries(setState,result.rows,replace);
+    const first=[...new Set(result.rows.map(r=>r.date))].sort()[0]; if(first)setDate(first);
+    setDone({added:result.rows.length,days:new Set(result.rows.map(r=>r.date)).size,refs});
   }
+  function undo(){ if(done&&done.refs)removeRefs(setState,done.refs); onClose(); }
 
   if(done) return (
     <Overlay title="Import abgeschlossen" onClose={onClose}>
       <div className="card">
         <p className="import-success">✅ {done.added} Einträge auf {done.days} {done.days===1?'Tag':'Tage'} verteilt.</p>
-        <p className="muted small">Datum und Mahlzeit wurden automatisch zugeordnet. Du findest alles unter „Heute" und im Archiv.</p>
-        <button className="primary" onClick={onClose}>Fertig</button>
+        <p className="muted small">Datum und Mahlzeit wurden automatisch zugeordnet.</p>
+        <div className="import-actions"><button className="primary" onClick={onClose}>Fertig</button><button className="chip" onClick={undo}>↩ Rückgängig</button></div>
       </div>
     </Overlay>
   );
@@ -468,8 +544,7 @@ function ImportPanel({setState,setDate,onClose}){
         <div className="card import-warn">
           <h3 className="card-title">⚠ {result.errors.length} Zeile(n) übersprungen</h3>
           <ul className="err-list">
-            {result.errors.slice(0,8).map(e=>(
-              <li key={e.line}><strong>Zeile {e.line}:</strong> {e.reason}<div className="muted small ellipsis">{e.text}</div></li>))}
+            {result.errors.slice(0,8).map(e=>(<li key={e.line}><strong>Zeile {e.line}:</strong> {e.reason}<div className="muted small ellipsis">{e.text}</div></li>))}
             {result.errors.length>8 && <li className="muted small">… und {result.errors.length-8} weitere</li>}
           </ul>
         </div>
@@ -480,7 +555,9 @@ function ImportPanel({setState,setDate,onClose}){
           <Stat label="Einträge" value={result.rows.length}/>
           <Stat label={byDate.length===1?'Tag':'Tage'} value={byDate.length}/>
           <Stat label="kcal gesamt" value={totals.calories}/>
-        </div></div>
+        </div>
+        {dupCount>0 && <p className="muted small" style={{marginBottom:0}}>⚠ {dupCount} Eintrag/Einträge existieren am Zieltag evtl. schon (gleicher Name, Mahlzeit & kcal).</p>}
+        </div>
         {byDate.map(([date,rows])=>(
           <div className="card" key={date}>
             <h3 className="card-title">{fullDate(date)}</h3>
@@ -507,23 +584,123 @@ function ImportPanel({setState,setDate,onClose}){
 }
 
 /* ---------- Heute ---------- */
-function Today({state,setState,date,setDate,openImport}){
+const numDe = v => (+String(v).replace(',','.'))||0;
+const n2s = v => (v==null||v===0||v==='')?'':String(v);
+function Mini({label,v,set}){return (<label className="mini-field"><span>{label}</span><input inputMode="decimal" value={v} onChange={e=>set(e.target.value)}/></label>);}
+
+function FoodForm({onSubmit,initial,submitLabel}){
+  const base={name:'',meal:defaultMeal(),quantity:'',calories:'',protein:'',carbs:'',sugar:'',fat:'',saturatedFat:'',fiber:'',salt:'',note:''};
+  const init=initial?{name:initial.name||'',meal:initial.meal||defaultMeal(),quantity:initial.quantity||'',calories:n2s(initial.calories),protein:n2s(initial.protein),carbs:n2s(initial.carbs),sugar:n2s(initial.sugar),fat:n2s(initial.fat),saturatedFat:n2s(initial.saturatedFat),fiber:n2s(initial.fiber),salt:n2s(initial.salt),note:initial.note||''}:base;
+  const [v,setV]=useState(init);
+  const [per100,setPer100]=useState(false);
+  const [grams,setGrams]=useState('');
+  const ch=k=>val=>setV({...v,[k]:val});
+  return (
+    <form className="form" onSubmit={e=>{e.preventDefault();if(!v.name.trim())return;
+      const f=(per100&&numDe(grams)>0)?numDe(grams)/100:1;
+      const sc=x=>Math.round(numDe(x)*f); const scS=x=>Math.round(numDe(x)*f*10)/10;
+      onSubmit({name:v.name.trim(),meal:v.meal,
+        quantity:(per100&&numDe(grams)>0)?(String(grams).replace(',','.')+' g'):(v.quantity.trim()||undefined),
+        calories:sc(v.calories),protein:sc(v.protein),carbs:sc(v.carbs),sugar:sc(v.sugar),fat:sc(v.fat),saturatedFat:sc(v.saturatedFat),fiber:sc(v.fiber),salt:scS(v.salt),
+        note:v.note.trim()||undefined,source:initial?(initial.source||'manual'):'manual'});}}>
+      <input placeholder="Was hast du gegessen?" value={v.name} onChange={e=>ch('name')(e.target.value)} autoFocus/>
+      <div className="form-grid two">
+        <select value={v.meal} onChange={e=>ch('meal')(e.target.value)}>{MEAL_ORDER.map(m=>(<option key={m} value={m}>{MEALS[m].icon} {MEALS[m].label}</option>))}</select>
+        <input placeholder="Menge (z.B. 200 g)" value={v.quantity} onChange={e=>ch('quantity')(e.target.value)} disabled={per100&&numDe(grams)>0}/>
+      </div>
+      <label className="toggle" style={{fontSize:13}}><input type="checkbox" checked={per100} onChange={e=>setPer100(e.target.checked)}/><span>Werte pro 100 g eingeben</span></label>
+      {per100 && <input inputMode="decimal" placeholder="Menge in Gramm (z.B. 250)" value={grams} onChange={e=>setGrams(e.target.value)}/>}
+      <div className="form-grid">
+        <Mini label={per100?'kcal/100g':'kcal'} v={v.calories} set={ch('calories')}/>
+        <Mini label="Eiweiß" v={v.protein} set={ch('protein')}/>
+        <Mini label="KH" v={v.carbs} set={ch('carbs')}/>
+        <Mini label="Fett" v={v.fat} set={ch('fat')}/>
+      </div>
+      <div className="form-grid">
+        <Mini label="Zucker" v={v.sugar} set={ch('sugar')}/>
+        <Mini label="ges. FS" v={v.saturatedFat} set={ch('saturatedFat')}/>
+        <Mini label="Ballast." v={v.fiber} set={ch('fiber')}/>
+        <Mini label="Salz" v={v.salt} set={ch('salt')}/>
+      </div>
+      <input placeholder="Notiz (optional)" value={v.note} onChange={e=>ch('note')(e.target.value)}/>
+      <button type="submit" className="primary">{submitLabel||'Hinzufügen'}</button>
+    </form>
+  );
+}
+function ExerciseForm({onSubmit}){
+  const [v,setV]=useState({name:'',durationMin:'',calories:''});
+  const ch=k=>e=>setV({...v,[k]:e.target.value});
+  return (
+    <form className="form" onSubmit={e=>{e.preventDefault();if(!v.name.trim())return;
+      onSubmit({name:v.name.trim(),durationMin:v.durationMin?+v.durationMin:undefined,calories:+v.calories||0});}}>
+      <input placeholder="Aktivität (z.B. Joggen)" value={v.name} onChange={ch('name')} autoFocus/>
+      <div className="form-grid two">
+        <input inputMode="numeric" placeholder="Minuten" value={v.durationMin} onChange={ch('durationMin')}/>
+        <input inputMode="numeric" placeholder="kcal verbrannt" value={v.calories} onChange={ch('calories')}/>
+      </div>
+      <button type="submit" className="primary">Hinzufügen</button>
+    </form>
+  );
+}
+function QuickPaste({setState,setDate,notify,onClose}){
+  const [text,setText]=useState('');
+  const res=useMemo(()=>parseStructured(text),[text]);
+  function go(){if(!res.rows.length)return;importEntries(setState,res.rows,false);const first=[...new Set(res.rows.map(r=>r.date))].sort()[0];if(first)setDate(first);notify(res.rows.length+' Einträge übernommen');setText('');onClose();}
+  return (
+    <div className="form">
+      <textarea className="import-text" placeholder="Tabelle einfügen (Datum ⇥ Mahlzeit ⇥ …) – wird direkt übernommen" value={text} onChange={e=>setText(e.target.value)} rows={4} spellCheck={false}/>
+      <div className="import-actions">
+        <span className="muted small" style={{alignSelf:'center'}}>{res.rows.length} erkannt{res.errors.length?(' · '+res.errors.length+' Fehler'):''}</span>
+        <button className="chip" onClick={()=>setText(IMPORT_EXAMPLE)}>Beispiel</button>
+        <button className="primary" style={{flex:1}} disabled={!res.rows.length} onClick={go}>Übernehmen</button>
+      </div>
+    </div>
+  );
+}
+function FavPanel({state,setState,date,notify,onClose}){
+  const favs=state.favorites;
+  return (
+    <div style={{margin:'4px 0 8px'}}>
+      {favs.length===0 && <p className="empty">Noch keine Favoriten. Tippe bei einem Eintrag auf ⭐, um ihn zu speichern.</p>}
+      <div className="fav-list">{favs.map(f=>(
+        <div className="fav-item" key={f.id}>
+          <button className="fav-add" onClick={()=>{addFoodTo(setState,date,{...favFrom(f),source:'manual'});notify(f.name+' hinzugefügt');}}>
+            <span className="fav-name">{MEALS[f.meal].icon} {f.name}{f.quantity&&<span className="fav-sub"> · {f.quantity}</span>}</span>
+            <span className="fav-sub">{Math.round(f.calories)} kcal</span>
+          </button>
+          <button className="del" title="Favorit löschen" onClick={()=>removeFavorite(setState,f.id)}>×</button>
+        </div>))}</div>
+    </div>
+  );
+}
+
+function Today({state,setState,date,setDate,openImport,notify}){
   const {profile,goal}=state;
   const day=state.days[date]||{date,foods:[],exercises:[]};
   const totals=sumNut(day.foods), consumed=totals.calories;
   const burned=Math.round(day.exercises.reduce((a,e)=>a+(+e.calories||0),0));
   const budget=dailyBudget(profile,goal,burned), target=targetMacros(budget,goal);
-  const [openF,setOpenF]=useState(false),[openE,setOpenE]=useState(false);
+  const [openF,setOpenF]=useState(false),[openE,setOpenE]=useState(false),[openFav,setOpenFav]=useState(false),[openPaste,setOpenPaste]=useState(false),[editId,setEditId]=useState(null),[pick,setPick]=useState(false);
+  const [wInput,setWInput]=useState(n2s(state.weights[date]));
+  useEffect(()=>{setWInput(n2s(state.weights[date]));},[date,state.weights]);
   const rmFood=id=>setState(s=>{const d=s.days[date];if(!d)return s;return{...s,days:{...s.days,[date]:{...d,foods:d.foods.filter(x=>x.id!==id)}}};});
   const rmEx=id=>setState(s=>{const d=s.days[date];if(!d)return s;return{...s,days:{...s.days,[date]:{...d,exercises:d.exercises.filter(x=>x.id!==id)}}};});
+  const prev=addDays(date,-1); const prevHas=(state.days[prev]&&state.days[prev].foods.length)>0;
+  const macroSegs=[{value:totals.protein*4,color:'var(--protein)'},{value:totals.carbs*4,color:'var(--carbs)'},{value:totals.fat*9,color:'var(--fat)'}];
 
   return (
     <div className="page page-today">
       <header className="datebar">
         <button className="nav-btn" onClick={()=>setDate(addDays(date,-1))}>‹</button>
-        <div className="datebar-label">{dateLabel(date)}</div>
+        {pick
+          ? <input type="date" className="date-input" autoFocus value={date} max={todayKey()} onChange={e=>{if(e.target.value)setDate(e.target.value);}} onBlur={()=>setPick(false)}/>
+          : <button className="datebar-label" onClick={()=>setPick(true)} title="Datum wählen">{dateLabel(date)} ▾</button>}
         <button className="nav-btn" onClick={()=>setDate(addDays(date,1))} disabled={date>=todayKey()}>›</button>
       </header>
+      <div className="toolbar">
+        {prevHas && <button className="chip" onClick={()=>{copyDay(setState,prev,date);notify('Mahlzeiten von gestern übernommen');}}>⊕ Gestern übernehmen</button>}
+        <button className="chip" onClick={()=>window.print()}>🖨️ Drucken</button>
+      </div>
       <div className="cols">
       <div className="col">
       <section className="card hero">
@@ -536,9 +713,14 @@ function Today({state,setState,date,setDate,openImport}){
       </section>
       <section className="card">
         <h3 className="card-title">Makronährstoffe</h3>
-        <MacroBar label="Eiweiß" value={totals.protein} target={target.protein} color="var(--protein)"/>
-        <MacroBar label="Kohlenhydrate" value={totals.carbs} target={target.carbs} color="var(--carbs)"/>
-        <MacroBar label="Fett" value={totals.fat} target={target.fat} color="var(--fat)"/>
+        <div className="macro-top">
+          <Donut segments={macroSegs} center={<div><b>{consumed}</b><div className="muted">kcal</div></div>}/>
+          <div className="bars">
+            <MacroBar label="Eiweiß" value={totals.protein} target={target.protein} color="var(--protein)"/>
+            <MacroBar label="Kohlenhydrate" value={totals.carbs} target={target.carbs} color="var(--carbs)"/>
+            <MacroBar label="Fett" value={totals.fat} target={target.fat} color="var(--fat)"/>
+          </div>
+        </div>
       </section>
       <section className="card">
         <h3 className="card-title">Weitere Nährwerte</h3>
@@ -554,28 +736,47 @@ function Today({state,setState,date,setDate,openImport}){
         <div className="energy-row"><span>± Ziel-Anpassung</span><strong>{goal.adjustment>0?'+':''}{goal.adjustment} kcal</strong></div>
         <div className="energy-row total"><span>= Tagesbudget</span><strong>{budget} kcal</strong></div>
       </section>
+      <section className="card">
+        <h3 className="card-title">⚖️ Gewicht</h3>
+        <div className="weight-row">
+          <div className="num-suffix"><input inputMode="decimal" placeholder="–" value={wInput} onChange={e=>setWInput(e.target.value)}
+            onBlur={()=>setWeight(setState,date,wInput.trim()===''?null:numDe(wInput))}
+            onKeyDown={e=>{if(e.key==='Enter')e.target.blur();}}/><span>kg</span></div>
+          {profile.targetWeight!=null && <span className="muted small">Ziel {profile.targetWeight} kg</span>}
+        </div>
+      </section>
       </div>
       <div className="col">
       <section className="card">
         <div className="section-head"><h3 className="card-title">Mahlzeiten</h3>
           <div className="section-actions">
             <button className="chip" onClick={openImport}>📋 Import</button>
-            <button className="chip" onClick={()=>setOpenF(o=>!o)}>{openF?'✕':'+ manuell'}</button>
+            <button className="chip" onClick={()=>setOpenPaste(o=>!o)}>{openPaste?'✕':'⚡ Einfügen'}</button>
+            <button className="chip" onClick={()=>setOpenFav(o=>!o)}>{openFav?'✕':'⭐ Favoriten'}</button>
+            <button className="chip" onClick={()=>{setEditId(null);setOpenF(o=>!o);}}>{openF?'✕':'+ manuell'}</button>
           </div></div>
+        {openPaste && <QuickPaste setState={setState} setDate={setDate} notify={notify} onClose={()=>setOpenPaste(false)}/>}
+        {openFav && <FavPanel state={state} setState={setState} date={date} notify={notify} onClose={()=>setOpenFav(false)}/>}
         {openF && <FoodForm onSubmit={f=>{addFoodTo(setState,date,f);setOpenF(false);}}/>}
-        {day.foods.length===0 && !openF && <p className="empty">Noch nichts erfasst. Tippe auf „📋 Import" oder „+ manuell".</p>}
+        {day.foods.length===0 && !openF && !openPaste && !openFav && <p className="empty">Noch nichts erfasst. Tippe auf „📋 Import", „⚡ Einfügen" oder „+ manuell".</p>}
         {MEAL_ORDER.map(meal=>{
           const items=day.foods.filter(f=>f.meal===meal); if(!items.length)return null;
           return (<div className="meal-group" key={meal}>
             <div className="meal-head"><span className="meal-title">{MEALS[meal].icon} {MEALS[meal].label}</span><span className="meal-kcal">{sumCal(items)} kcal</span></div>
-            <ul className="entries">{items.map(f=>(
+            <ul className="entries">{items.map(f=> editId===f.id
+              ? (<li key={f.id}><FoodForm initial={f} submitLabel="Speichern" onSubmit={data=>{updateFood(setState,date,f.id,data);setEditId(null);}}/></li>)
+              : (
               <li className="entry" key={f.id}>
                 <div className="entry-main"><span className="entry-name">{f.name}</span>
                   {f.quantity&&<span className="entry-qty">{f.quantity}</span>}
                   <span className="entry-macros">E {f.protein} · KH {f.carbs} · F {f.fat} g{f.fiber?(' · Bst '+f.fiber+' g'):''}{f.source!=='import'?(' · '+timeLabel(f.time)):''}</span>
                   {f.note&&<span className="entry-note">{f.note}</span>}</div>
                 <div className="entry-kcal">{Math.round(f.calories)}</div>
-                <button className="del" onClick={()=>rmFood(f.id)}>×</button>
+                <div className="entry-actions">
+                  <button className="icon-btn" title="Als Favorit speichern" onClick={()=>{addFavorite(setState,favFrom(f));notify('Als Favorit gespeichert ⭐');}}>⭐</button>
+                  <button className="icon-btn" title="Bearbeiten" onClick={()=>{setOpenF(false);setEditId(f.id);}}>✎</button>
+                  <button className="del" title="Löschen" onClick={()=>rmFood(f.id)}>×</button>
+                </div>
               </li>))}</ul>
           </div>);
         })}
@@ -583,9 +784,7 @@ function Today({state,setState,date,setDate,openImport}){
 
       <section className="card">
         <div className="section-head"><h3 className="card-title">Sport</h3>
-          <div className="section-actions">
-            <button className="chip" onClick={()=>setOpenE(o=>!o)}>{openE?'✕':'+ manuell'}</button>
-          </div></div>
+          <div className="section-actions"><button className="chip" onClick={()=>setOpenE(o=>!o)}>{openE?'✕':'+ manuell'}</button></div></div>
         {openE && <ExerciseForm onSubmit={e=>{addExTo(setState,date,e);setOpenE(false);}}/>}
         {day.exercises.length===0 && !openE && <p className="empty">Noch kein Sport erfasst.</p>}
         <ul className="entries">{day.exercises.map(e=>(
@@ -602,58 +801,12 @@ function Today({state,setState,date,setDate,openImport}){
   );
 }
 
-const numDe = v => (+String(v).replace(',','.'))||0;
-function Mini({label,v,set}){return (<label className="mini-field"><span>{label}</span><input inputMode="decimal" value={v} onChange={e=>set(e.target.value)}/></label>);}
-function FoodForm({onSubmit}){
-  const [v,setV]=useState({name:'',meal:defaultMeal(),quantity:'',calories:'',protein:'',carbs:'',sugar:'',fat:'',saturatedFat:'',fiber:'',salt:'',note:''});
-  const ch=k=>val=>setV({...v,[k]:val});
-  return (
-    <form className="form" onSubmit={e=>{e.preventDefault();if(!v.name.trim())return;
-      onSubmit({name:v.name.trim(),meal:v.meal,quantity:v.quantity.trim()||undefined,calories:numDe(v.calories),protein:numDe(v.protein),carbs:numDe(v.carbs),sugar:numDe(v.sugar),fat:numDe(v.fat),saturatedFat:numDe(v.saturatedFat),fiber:numDe(v.fiber),salt:numDe(v.salt),note:v.note.trim()||undefined,source:'manual'});}}>
-      <input placeholder="Was hast du gegessen?" value={v.name} onChange={e=>ch('name')(e.target.value)}/>
-      <div className="form-grid two">
-        <select value={v.meal} onChange={e=>ch('meal')(e.target.value)}>{MEAL_ORDER.map(m=>(<option key={m} value={m}>{MEALS[m].icon} {MEALS[m].label}</option>))}</select>
-        <input placeholder="Menge (z.B. 200 g)" value={v.quantity} onChange={e=>ch('quantity')(e.target.value)}/>
-      </div>
-      <div className="form-grid">
-        <Mini label="kcal" v={v.calories} set={ch('calories')}/>
-        <Mini label="Eiweiß" v={v.protein} set={ch('protein')}/>
-        <Mini label="KH" v={v.carbs} set={ch('carbs')}/>
-        <Mini label="Fett" v={v.fat} set={ch('fat')}/>
-      </div>
-      <div className="form-grid">
-        <Mini label="Zucker" v={v.sugar} set={ch('sugar')}/>
-        <Mini label="ges. FS" v={v.saturatedFat} set={ch('saturatedFat')}/>
-        <Mini label="Ballast." v={v.fiber} set={ch('fiber')}/>
-        <Mini label="Salz" v={v.salt} set={ch('salt')}/>
-      </div>
-      <input placeholder="Notiz (optional)" value={v.note} onChange={e=>ch('note')(e.target.value)}/>
-      <button type="submit" className="primary">Hinzufügen</button>
-    </form>
-  );
-}
-function ExerciseForm({onSubmit}){
-  const [v,setV]=useState({name:'',durationMin:'',calories:''});
-  const ch=k=>e=>setV({...v,[k]:e.target.value});
-  return (
-    <form className="form" onSubmit={e=>{e.preventDefault();if(!v.name.trim())return;
-      onSubmit({name:v.name.trim(),durationMin:v.durationMin?+v.durationMin:undefined,calories:+v.calories||0});}}>
-      <input placeholder="Aktivität (z.B. Joggen)" value={v.name} onChange={ch('name')}/>
-      <div className="form-grid two">
-        <input inputMode="numeric" placeholder="Minuten" value={v.durationMin} onChange={ch('durationMin')}/>
-        <input inputMode="numeric" placeholder="kcal verbrannt" value={v.calories} onChange={ch('calories')}/>
-      </div>
-      <button type="submit" className="primary">Hinzufügen</button>
-    </form>
-  );
-}
-
 /* ---------- Auswertung ---------- */
 const METRICS=[{id:'calories',label:'Kalorien',unit:' kcal'},{id:'protein',label:'Eiweiß',unit:' g'},{id:'carbs',label:'KH',unit:' g'},{id:'fat',label:'Fett',unit:' g'},{id:'fiber',label:'Ballaststoffe',unit:' g'},{id:'sugar',label:'Zucker',unit:' g'},{id:'salt',label:'Salz',unit:' g'}];
 const METRIC_COLOR={calories:'var(--data)',protein:'var(--protein)',carbs:'var(--carbs)',fat:'var(--fat)',fiber:'var(--fiber)',sugar:'var(--sugar)',salt:'var(--salt)'};
 const avgArr = arr => arr.length?Math.round((arr.reduce((a,b)=>a+b,0)/arr.length)*10)/10:0;
-function Stats({state}){
-  const {profile,goal,days}=state;
+function Stats({state,setDate,goToToday}){
+  const {profile,goal,days,weights}=state;
   const [range,setRange]=useState(7);
   const [metric,setMetric]=useState('calories');
   const today=todayKey();
@@ -676,10 +829,12 @@ function Stats({state}){
     return {key:r.key,value,ref,over};
   });
   const mInfo=METRICS.find(m=>m.id===metric);
-  const tValues=chartData.filter((_,i)=>rows[i].has).map(d=>d.value);
-  const mAvg=avgArr(tValues);
-  const half=Math.floor(tValues.length/2);
-  const trend=tValues.length>=4?avgArr(tValues.slice(half))-avgArr(tValues.slice(0,half)):0;
+  const tVals=chartData.map((d,i)=>rows[i].has?d.value:null);
+  const present=tVals.filter(v=>v!=null);
+  const mAvg=avgArr(present);
+  const avgLine=tVals.map((_,i)=>{let s=0,c=0;for(let j=Math.max(0,i-6);j<=i;j++){if(tVals[j]!=null){s+=tVals[j];c++;}}return c?Math.round((s/c)*10)/10:null;});
+  const half=Math.floor(present.length/2);
+  const trend=present.length>=4?avgArr(present.slice(half))-avgArr(present.slice(0,half)):0;
 
   const avgTotals={calories:avgArr(tracked.map(r=>r.totals.calories)),protein:avgArr(tracked.map(r=>r.totals.protein)),carbs:avgArr(tracked.map(r=>r.totals.carbs)),sugar:avgArr(tracked.map(r=>r.totals.sugar)),fat:avgArr(tracked.map(r=>r.totals.fat)),saturatedFat:avgArr(tracked.map(r=>r.totals.saturatedFat)),fiber:avgArr(tracked.map(r=>r.totals.fiber)),salt:avgArr(tracked.map(r=>r.totals.salt))};
   const avgBudget=Math.round(avgArr(rows.map(r=>r.budget)));
@@ -688,7 +843,13 @@ function Stats({state}){
   const mealMax=Math.max(...mealAvg.map(m=>m.kcal),1);
   const withinBudget=tracked.filter(r=>r.totals.calories<=r.budget).length;
   const avgDev=tracked.length?Math.round(avgArr(tracked.map(r=>r.totals.calories-r.budget))):0;
+  const balance=tracked.reduce((a,r)=>a+(r.totals.calories-r.budget),0);
+  const balKg=Math.round(balance/KCAL_PER_KG*100)/100;
   let streak=0; for(let i=0;;i++){const k=addDays(today,-i);if((days[k]&&days[k].foods.length)>0)streak++;else break;}
+
+  const wpts=rows.map(r=>({key:r.key,value:weights[r.key]!=null?weights[r.key]:null}));
+  const wPresent=wpts.filter(p=>p.value!=null);
+  const wChange=wPresent.length>=2?Math.round((wPresent[wPresent.length-1].value-wPresent[0].value)*10)/10:null;
 
   return (
     <div className="page">
@@ -698,10 +859,29 @@ function Stats({state}){
       <section className="card">
         <h3 className="card-title">Zeitverlauf</h3>
         <div className="metric-chips">{METRICS.map(m=>(<button key={m.id} className={'metric-chip'+(metric===m.id?' on':'')} onClick={()=>setMetric(m.id)}>{m.label}</button>))}</div>
-        <DayBars data={chartData} unit={mInfo.unit} color={METRIC_COLOR[metric]}/>
-        <div className="chart-legend"><span><i className="sw" style={{background:METRIC_COLOR[metric]}}/> Wert</span><span><i className="sw line"/> Ziel/Budget</span><span><i className="sw danger"/> über Ziel</span></div>
+        <DayBars data={chartData} unit={mInfo.unit} color={METRIC_COLOR[metric]} avg={avgLine}/>
+        <div className="chart-legend"><span><i className="sw" style={{background:METRIC_COLOR[metric]}}/> Wert</span><span><i className="sw line"/> Ziel/Budget</span><span><i className="sw avgline"/> Ø 7 T</span><span><i className="sw danger"/> über Ziel</span></div>
         {tracked.length>0 &&
-          <div className="avg-row" style={{marginTop:12}}><span>Ø {mInfo.label}{tValues.length>=4&&<span className="muted small"> {trend>0?'↑ steigend':trend<0?'↓ fallend':'→ stabil'}</span>}</span><strong>{mAvg}{mInfo.unit}</strong></div>}
+          <div className="avg-row" style={{marginTop:12}}><span>Ø {mInfo.label}{present.length>=4&&<span className="muted small"> {trend>0?'↑ steigend':trend<0?'↓ fallend':'→ stabil'}</span>}</span><strong>{mAvg}{mInfo.unit}</strong></div>}
+      </section>
+
+      <section className="card">
+        <h3 className="card-title">📅 Kalender</h3>
+        <Heatmap days={days} profile={profile} goal={goal} onPick={k=>{setDate(k);goToToday();}}/>
+      </section>
+
+      {wPresent.length>0 && (
+        <section className="card">
+          <h3 className="card-title">⚖️ Gewichtsverlauf</h3>
+          <LineChart points={wpts} target={profile.targetWeight}/>
+          <div className="avg-row" style={{marginTop:8}}><span>Aktuell{wChange!=null&&<span className="muted small"> {wChange>0?'+':''}{wChange} kg im Zeitraum</span>}</span><strong>{wPresent[wPresent.length-1].value} kg</strong></div>
+        </section>
+      )}
+
+      <section className="card">
+        <h3 className="card-title">Kalorienbilanz {tracked.length>0?`(${tracked.length} Tage)`:''}</h3>
+        <div className="avg-row"><span>{balance<=0?'Defizit':'Überschuss'} gesamt</span><strong className={balance>0?'over':''}>{balance>0?'+':''}{balance} kcal</strong></div>
+        <p className="muted small" style={{marginBottom:0}}>≈ {balKg>0?'+':''}{balKg} kg geschätzte Veränderung im Zeitraum (≈ {KCAL_PER_KG} kcal/kg).</p>
       </section>
 
       <section className="card">
@@ -747,11 +927,14 @@ function Stats({state}){
 function Archive({state,setState,setDate,goToToday,openImport}){
   const {profile,goal,days}=state;
   const [showExport,setShowExport]=useState(false);
+  const [q,setQ]=useState('');
   const dayList=useMemo(()=>Object.values(days).filter(d=>d.foods.length>0||d.exercises.length>0).sort((a,b)=>b.date.localeCompare(a.date)).map(d=>{
     const totals=sumNut(d.foods); const burned=Math.round(d.exercises.reduce((a,e)=>a+(+e.calories||0),0)); const budget=dailyBudget(profile,goal,burned);
     return {...d,totals,budget,over:totals.calories>budget};
   }),[days,profile,goal]);
-  const groups=useMemo(()=>{const map=new Map();dayList.forEach(d=>{const l=monthLabel(d.date);if(!map.has(l))map.set(l,[]);map.get(l).push(d);});return [...map.entries()];},[dayList]);
+  const ql=q.trim().toLowerCase();
+  const filtered=ql?dayList.filter(d=>d.foods.some(f=>f.name.toLowerCase().includes(ql))):dayList;
+  const groups=useMemo(()=>{const map=new Map();filtered.forEach(d=>{const l=monthLabel(d.date);if(!map.has(l))map.set(l,[]);map.get(l).push(d);});return [...map.entries()];},[filtered]);
   const totalDays=dayList.length, totalEntries=dayList.reduce((a,d)=>a+d.foods.length,0);
   const open=date=>{setDate(date);goToToday();};
   const del=date=>{if(confirm('Tag '+dateLabel(date)+' wirklich aus dem Archiv löschen?'))setState(s=>{const ds={...s.days};delete ds[date];return{...s,days:ds};});};
@@ -763,12 +946,14 @@ function Archive({state,setState,setDate,goToToday,openImport}){
           <button className="chip" onClick={openImport}>📋 Import</button>
           {totalEntries>0 && <button className="chip" onClick={()=>setShowExport(true)}>⬇ Export</button>}
         </div></header>
+      {totalDays>0 && <input placeholder="🔎 Lebensmittel suchen…" value={q} onChange={e=>setQ(e.target.value)}/>}
       {totalDays>0 &&
         <section className="card"><div className="hero-stats">
           <Stat label="erfasste Tage" value={totalDays}/>
           <Stat label="Einträge" value={totalEntries}/>
         </div></section>}
       {totalDays===0 && <p className="empty">Noch keine Tage im Archiv. Importiere deine Tabelle oder erfasse Mahlzeiten unter „Heute".</p>}
+      {ql && filtered.length===0 && <p className="empty">Keine Treffer für „{q}".</p>}
       {groups.map(([month,list])=>(
         <div key={month}>
           <h3 className="month-head">{month}</h3>
@@ -815,8 +1000,9 @@ function ExportOverlay({days,onClose}){
 
 /* ---------- Profil ---------- */
 const PRESETS=[{mode:'lose',label:'Abnehmen (−500)',adj:-500},{mode:'lose',label:'Leicht abnehmen (−300)',adj:-300},{mode:'maintain',label:'Halten (±0)',adj:0},{mode:'gain',label:'Aufbauen (+300)',adj:300},{mode:'gain',label:'Aufbauen (+500)',adj:500}];
-function Profile({state,setState}){
-  const {profile,goal}=state;
+function Profile({state,setState,notify}){
+  const {profile,goal,favorites}=state;
+  const fileRef=useRef(null);
   const setP=p=>setState(s=>({...s,profile:{...s.profile,...p}}));
   const setG=g=>setState(s=>({...s,goal:{...s.goal,...g}}));
   const tgt=targetMacros(maintenance(profile)+goal.adjustment,goal);
@@ -824,6 +1010,9 @@ function Profile({state,setState}){
   const perWeek=weeklyChange(goal.adjustment);
   const weeks=weeksToTarget(profile,goal);
   const pickDiet=style=>setG({dietStyle:style,...DIET_MACROS[style]});
+  function backup(){const data=JSON.stringify({app:'essen',v:1,exportedAt:new Date().toISOString(),state},null,2);const blob=new Blob([data],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='essen-backup-'+todayKey()+'.json';a.click();URL.revokeObjectURL(url);notify('Backup heruntergeladen');}
+  function restoreText(text){try{const o=JSON.parse(text);const data=o&&o.state?o.state:o;if(!data||(!data.days&&!data.profile))throw 0;if(!confirm('Aktuelle Daten durch das Backup ersetzen?'))return;setState(normalizeState(data));notify('Daten wiederhergestellt');}catch(e){alert('Konnte die Datei nicht lesen (kein gültiges Essen-Backup).');}}
+  function onFile(e){const f=e.target.files&&e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>restoreText(String(r.result));r.readAsText(f);e.target.value='';}
   return (
     <div className="page">
       <header className="chat-head"><h2>Profil &amp; Wünsche</h2></header>
@@ -887,8 +1076,28 @@ function Profile({state,setState}){
 
       <section className="card">
         <h3 className="card-title">Vorlieben &amp; Hinweise</h3>
-        <p className="muted small" style={{marginTop:0}}>Allergien, Unverträglichkeiten, Lieblings- oder No-Go-Lebensmittel. Fließt in die KI-Vorschläge ein.</p>
+        <p className="muted small" style={{marginTop:0}}>Allergien, Unverträglichkeiten, Lieblings- oder No-Go-Lebensmittel – als persönliche Notiz.</p>
         <textarea className="pref-text" placeholder="z.B. vegetarisch, keine Laktose, mag kein Fisch, viel Gemüse …" value={goal.preferences} onChange={e=>setG({preferences:e.target.value})} rows={3}/>
+      </section>
+
+      <section className="card">
+        <h3 className="card-title">⭐ Favoriten ({favorites.length})</h3>
+        {favorites.length===0 && <p className="empty">Noch keine. Tippe unter „Heute" bei einem Eintrag auf ⭐.</p>}
+        <div className="fav-list">{favorites.map(f=>(
+          <div className="fav-item" key={f.id}>
+            <div className="fav-add" style={{cursor:'default'}}><span className="fav-name">{MEALS[f.meal].icon} {f.name}{f.quantity&&<span className="fav-sub"> · {f.quantity}</span>}</span><span className="fav-sub">{Math.round(f.calories)} kcal</span></div>
+            <button className="del" onClick={()=>removeFavorite(setState,f.id)}>×</button>
+          </div>))}</div>
+      </section>
+
+      <section className="card">
+        <h3 className="card-title">💾 Daten &amp; Sicherung</h3>
+        <p className="muted small" style={{marginTop:0}}>Alle Daten liegen nur in diesem Browser. Lade regelmäßig ein Backup herunter, damit nichts verloren geht.</p>
+        <div className="import-actions">
+          <button className="chip" onClick={backup}>⬇ Backup (JSON)</button>
+          <button className="chip" onClick={()=>fileRef.current&&fileRef.current.click()}>↥ Wiederherstellen</button>
+          <input ref={fileRef} type="file" accept="application/json,.json" style={{display:'none'}} onChange={onFile}/>
+        </div>
       </section>
 
       <p className="footer-note">Daten bleiben lokal in diesem Browser (offline-fähig). Erfassung per „📋 Import“ (Copy &amp; Paste) oder „+ manuell“.</p>
@@ -903,15 +1112,34 @@ function App(){
   const [tab,setTab]=useState('today');
   const [date,setDate]=useState(todayKey());
   const [importOpen,setImportOpen]=useState(false);
+  const [toast,setToast]=useState(null);
   useEffect(()=>{save(state);},[state]);
+  const notify=msg=>{setToast(msg);clearTimeout(notify._t);notify._t=setTimeout(()=>setToast(null),1900);};
+
+  const dateRef=useRef(date); dateRef.current=date;
+  const tabRef=useRef(tab); tabRef.current=tab;
+  const impRef=useRef(importOpen); impRef.current=importOpen;
+  useEffect(()=>{
+    const onKey=e=>{
+      const t=e.target;
+      if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.tagName==='SELECT'||t.isContentEditable))return;
+      if(impRef.current){ if(e.key==='Escape')setImportOpen(false); return; }
+      if(e.key==='ArrowLeft'&&tabRef.current==='today'){setDate(addDays(dateRef.current,-1));}
+      else if(e.key==='ArrowRight'&&tabRef.current==='today'){if(dateRef.current<todayKey())setDate(addDays(dateRef.current,1));}
+      else if(e.key==='t'||e.key==='T'){setDate(todayKey());setTab('today');}
+      else if(e.key==='i'||e.key==='I'){setImportOpen(true);}
+    };
+    window.addEventListener('keydown',onKey);
+    return ()=>window.removeEventListener('keydown',onKey);
+  },[]);
 
   return (
     <div className="app">
       <main className="content">
-        {tab==='today' && <Today state={state} setState={setState} date={date} setDate={setDate} openImport={()=>setImportOpen(true)}/>}
-        {tab==='stats' && <Stats state={state}/>}
+        {tab==='today' && <Today state={state} setState={setState} date={date} setDate={setDate} openImport={()=>setImportOpen(true)} notify={notify}/>}
+        {tab==='stats' && <Stats state={state} setDate={setDate} goToToday={()=>setTab('today')}/>}
         {tab==='archive' && <Archive state={state} setState={setState} setDate={setDate} goToToday={()=>setTab('today')} openImport={()=>setImportOpen(true)}/>}
-        {tab==='profile' && <Profile state={state} setState={setState}/>}
+        {tab==='profile' && <Profile state={state} setState={setState} notify={notify}/>}
       </main>
       <nav className="tabbar">
         <div className="brand"><span className="brand-icon">🍊</span><span className="brand-name">Essen</span></div>
@@ -919,7 +1147,8 @@ function App(){
         <button key={t.id} className={'tab'+(tab===t.id?' active':'')} onClick={()=>setTab(t.id)}>
           <span className="tab-icon">{t.icon}</span><span className="tab-label">{t.label}</span></button>))}
       </nav>
-      {importOpen && <ImportPanel setState={setState} setDate={setDate} onClose={()=>setImportOpen(false)}/>}
+      {importOpen && <ImportPanel state={state} setState={setState} setDate={setDate} onClose={()=>setImportOpen(false)}/>}
+      {toast && <div className="toast">{toast}</div>}
     </div>
   );
 }
