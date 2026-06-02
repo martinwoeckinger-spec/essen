@@ -12,7 +12,8 @@
   :root{
     --bg:#0a0a0a;--bg2:#111111;--card:#171717;--card2:#242424;--text:#fafafa;--muted:#9ca3af;
     --accent:#f97316;--accent2:#fb923c;--danger:#ef4444;--track:#2c2c2c;
-    --protein:#f97316;--carbs:#facc15;--fat:#fb7185;--radius:14px;
+    --protein:#34d399;--carbs:#38bdf8;--fat:#c084fc;--radius:14px;
+    --fiber:#a3e635;--sugar:#f472b6;--satfat:#fb7185;--salt:#94a3b8;--data:#60a5fa;
     --safe-bottom:env(safe-area-inset-bottom,0px);--safe-top:env(safe-area-inset-top,0px);
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -95,14 +96,14 @@
   .chart{display:flex;align-items:flex-end;gap:4px;height:160px;padding-top:8px}
   .chart-col{flex:1;display:flex;flex-direction:column;align-items:center;height:100%}
   .chart-bar-wrap{position:relative;flex:1;width:100%;display:flex;align-items:flex-end;justify-content:center}
-  .chart-bar{width:70%;background:var(--accent);border-radius:4px 4px 0 0;min-height:2px;transition:height .3s}
+  .chart-bar{width:70%;background:var(--data);border-radius:4px 4px 0 0;min-height:2px;transition:height .3s}
   .chart-bar.over{background:var(--danger)}
   .budget-line{position:absolute;left:0;right:0;height:2px;background:var(--muted);opacity:.6}
   .chart-label{font-size:10px;color:var(--muted);margin-top:4px}
   .chart-legend{display:flex;gap:14px;justify-content:center;margin-top:12px;font-size:12px;color:var(--muted)}
   .chart-legend span{display:flex;align-items:center;gap:5px}
   .sw{width:12px;height:12px;border-radius:3px;display:inline-block}
-  .sw.accent{background:var(--accent)}.sw.danger{background:var(--danger)}.sw.line{background:var(--muted);height:3px;border-radius:2px}
+  .sw.accent{background:var(--data)}.sw.danger{background:var(--danger)}.sw.line{background:var(--muted);height:3px;border-radius:2px}
   .avg-row{display:flex;justify-content:space-between;font-size:16px}.avg-row strong{color:var(--accent2)}
   .field{margin-bottom:12px}.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px;font-weight:600}
   .field-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
@@ -398,7 +399,7 @@ const MacroBar=({label,value,target,color,unit='g',limit=false})=>{
     </div>
   );
 };
-const DayBars=({data,unit=''})=>{
+const DayBars=({data,unit='',color='var(--data)'})=>{
   const max=Math.max(...data.map(d=>Math.max(d.value,d.ref||0)),1);
   return (<div className="chart">{data.map(d=>{
     const h=(d.value/max)*100, refH=d.ref!=null?(d.ref/max)*100:null;
@@ -406,7 +407,7 @@ const DayBars=({data,unit=''})=>{
       <div className="chart-col" key={d.key} title={`${d.key}: ${d.value}${unit}`}>
         <div className="chart-bar-wrap">
           {refH!=null&&<div className="budget-line" style={{bottom:Math.min(refH,100)+'%'}}/>}
-          <div className={'chart-bar'+(d.over?' over':'')} style={{height:Math.min(h,100)+'%'}}/>
+          <div className={'chart-bar'+(d.over?' over':'')} style={{height:Math.min(h,100)+'%',background:d.over?undefined:color}}/>
         </div>
         <div className="chart-label">{d.key.slice(8)}</div>
       </div>);})}</div>);
@@ -541,10 +542,10 @@ function Today({state,setState,date,setDate,openImport}){
       </section>
       <section className="card">
         <h3 className="card-title">Weitere Nährwerte</h3>
-        <MacroBar label="Ballaststoffe" value={totals.fiber} target={goal.fiberGoal} color="var(--accent2)"/>
-        <MacroBar label="Zucker" value={totals.sugar} target={goal.sugarLimit} color="var(--carbs)" limit/>
-        <MacroBar label="ges. Fettsäuren" value={totals.saturatedFat} target={goal.satFatLimit} color="var(--fat)" limit/>
-        <MacroBar label="Salz" value={totals.salt} target={goal.saltLimit} color="var(--muted)" limit/>
+        <MacroBar label="Ballaststoffe" value={totals.fiber} target={goal.fiberGoal} color="var(--fiber)"/>
+        <MacroBar label="Zucker" value={totals.sugar} target={goal.sugarLimit} color="var(--sugar)" limit/>
+        <MacroBar label="ges. Fettsäuren" value={totals.saturatedFat} target={goal.satFatLimit} color="var(--satfat)" limit/>
+        <MacroBar label="Salz" value={totals.salt} target={goal.saltLimit} color="var(--salt)" limit/>
       </section>
       <section className="card">
         <div className="energy-row"><span>Grundumsatz</span><strong>{bmr(profile)} kcal</strong></div>
@@ -649,6 +650,7 @@ function ExerciseForm({onSubmit}){
 
 /* ---------- Auswertung ---------- */
 const METRICS=[{id:'calories',label:'Kalorien',unit:' kcal'},{id:'protein',label:'Eiweiß',unit:' g'},{id:'carbs',label:'KH',unit:' g'},{id:'fat',label:'Fett',unit:' g'},{id:'fiber',label:'Ballaststoffe',unit:' g'},{id:'sugar',label:'Zucker',unit:' g'},{id:'salt',label:'Salz',unit:' g'}];
+const METRIC_COLOR={calories:'var(--data)',protein:'var(--protein)',carbs:'var(--carbs)',fat:'var(--fat)',fiber:'var(--fiber)',sugar:'var(--sugar)',salt:'var(--salt)'};
 const avgArr = arr => arr.length?Math.round((arr.reduce((a,b)=>a+b,0)/arr.length)*10)/10:0;
 function Stats({state}){
   const {profile,goal,days}=state;
@@ -696,8 +698,8 @@ function Stats({state}){
       <section className="card">
         <h3 className="card-title">Zeitverlauf</h3>
         <div className="metric-chips">{METRICS.map(m=>(<button key={m.id} className={'metric-chip'+(metric===m.id?' on':'')} onClick={()=>setMetric(m.id)}>{m.label}</button>))}</div>
-        <DayBars data={chartData} unit={mInfo.unit}/>
-        <div className="chart-legend"><span><i className="sw accent"/> Wert</span><span><i className="sw line"/> Ziel/Budget</span><span><i className="sw danger"/> über Ziel</span></div>
+        <DayBars data={chartData} unit={mInfo.unit} color={METRIC_COLOR[metric]}/>
+        <div className="chart-legend"><span><i className="sw" style={{background:METRIC_COLOR[metric]}}/> Wert</span><span><i className="sw line"/> Ziel/Budget</span><span><i className="sw danger"/> über Ziel</span></div>
         {tracked.length>0 &&
           <div className="avg-row" style={{marginTop:12}}><span>Ø {mInfo.label}{tValues.length>=4&&<span className="muted small"> {trend>0?'↑ steigend':trend<0?'↓ fallend':'→ stabil'}</span>}</span><strong>{mAvg}{mInfo.unit}</strong></div>}
       </section>
@@ -713,10 +715,10 @@ function Stats({state}){
 
       <section className="card">
         <h3 className="card-title">Ø weitere Nährwerte</h3>
-        <MacroBar label="Ballaststoffe" value={avgTotals.fiber} target={goal.fiberGoal} color="var(--accent2)"/>
-        <MacroBar label="Zucker" value={avgTotals.sugar} target={goal.sugarLimit} color="var(--carbs)" limit/>
-        <MacroBar label="ges. Fettsäuren" value={avgTotals.saturatedFat} target={goal.satFatLimit} color="var(--fat)" limit/>
-        <MacroBar label="Salz" value={avgTotals.salt} target={goal.saltLimit} color="var(--muted)" limit/>
+        <MacroBar label="Ballaststoffe" value={avgTotals.fiber} target={goal.fiberGoal} color="var(--fiber)"/>
+        <MacroBar label="Zucker" value={avgTotals.sugar} target={goal.sugarLimit} color="var(--sugar)" limit/>
+        <MacroBar label="ges. Fettsäuren" value={avgTotals.saturatedFat} target={goal.satFatLimit} color="var(--satfat)" limit/>
+        <MacroBar label="Salz" value={avgTotals.salt} target={goal.saltLimit} color="var(--salt)" limit/>
       </section>
 
       <section className="card">
@@ -724,7 +726,7 @@ function Stats({state}){
         {mealAvg.map(m=>(
           <div className="macro" key={m.meal}>
             <div className="macro-head"><span className="macro-label">{MEALS[m.meal].icon} {MEALS[m.meal].label}</span><span className="macro-num">{m.kcal} kcal</span></div>
-            <div className="bar"><div className="bar-fill" style={{width:(m.kcal/mealMax)*100+'%',background:'var(--accent)'}}/></div>
+            <div className="bar"><div className="bar-fill" style={{width:(m.kcal/mealMax)*100+'%',background:'var(--data)'}}/></div>
           </div>))}
       </section>
 
