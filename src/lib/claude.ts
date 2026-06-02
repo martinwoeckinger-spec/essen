@@ -2,17 +2,26 @@ import Anthropic from '@anthropic-ai/sdk';
 
 export interface FoodToolInput {
   name: string;
+  meal?: 'breakfast' | 'lunch' | 'dinner' | 'snack';
   quantity?: string;
   calories: number;
   protein: number;
   carbs: number;
   fat: number;
+  sugar?: number;
+  saturatedFat?: number;
+  fiber?: number;
+  salt?: number;
+  note?: string;
+  /** Zieltag im Format YYYY-MM-DD (Standard: aktuell gewählter Tag). */
+  date?: string;
 }
 
 export interface ExerciseToolInput {
   name: string;
   durationMin?: number;
   calories: number;
+  date?: string;
 }
 
 export interface ToolHandlers {
@@ -36,26 +45,38 @@ const tools = [
   {
     name: 'add_food',
     description:
-      'Trägt ein gegessenes Lebensmittel bzw. eine Mahlzeit in das Tagebuch des aktuell ausgewählten Tages ein. ' +
-      'Wenn der Nutzer keine genauen Nährwerte nennt, schätze realistische Werte anhand üblicher Portionsgrößen. ' +
-      'Lege für jedes einzelne Lebensmittel einen eigenen Eintrag an.',
+      'Trägt ein gegessenes Lebensmittel bzw. eine Mahlzeit in das Tagebuch ein. ' +
+      'Ordne immer eine Mahlzeit (meal) zu und schätze fehlende Nährwerte realistisch anhand üblicher Portionsgrößen. ' +
+      'Lege für jedes einzelne Lebensmittel einen eigenen Eintrag an. ' +
+      'Für einen anderen Tag (z.B. "gestern") gib date im Format YYYY-MM-DD an.',
     input_schema: {
       type: 'object',
       properties: {
         name: { type: 'string', description: 'Name des Lebensmittels / der Mahlzeit' },
+        meal: {
+          type: 'string',
+          enum: ['breakfast', 'lunch', 'dinner', 'snack'],
+          description: 'Mahlzeit: breakfast=Frühstück, lunch=Mittag, dinner=Abend, snack=Snack',
+        },
         quantity: { type: 'string', description: 'Menge, z.B. "200 g" oder "1 Portion"' },
         calories: { type: 'number', description: 'Kalorien in kcal' },
         protein: { type: 'number', description: 'Eiweiß in Gramm' },
         carbs: { type: 'number', description: 'Kohlenhydrate in Gramm' },
+        sugar: { type: 'number', description: 'davon Zucker in Gramm' },
         fat: { type: 'number', description: 'Fett in Gramm' },
+        saturatedFat: { type: 'number', description: 'davon gesättigte Fettsäuren in Gramm' },
+        fiber: { type: 'number', description: 'Ballaststoffe in Gramm' },
+        salt: { type: 'number', description: 'Salz in Gramm' },
+        note: { type: 'string', description: 'Kurze Notiz (optional)' },
+        date: { type: 'string', description: 'Tag im Format YYYY-MM-DD (optional)' },
       },
-      required: ['name', 'calories', 'protein', 'carbs', 'fat'],
+      required: ['name', 'meal', 'calories', 'protein', 'carbs', 'fat'],
     },
   },
   {
     name: 'add_exercise',
     description:
-      'Trägt eine sportliche Aktivität (Sportumsatz) in das Tagebuch des ausgewählten Tages ein. ' +
+      'Trägt eine sportliche Aktivität (Sportumsatz) in das Tagebuch ein. ' +
       'Schätze die verbrannten Kalorien realistisch, falls nicht angegeben.',
     input_schema: {
       type: 'object',
@@ -63,6 +84,7 @@ const tools = [
         name: { type: 'string', description: 'Art der Aktivität, z.B. "Joggen"' },
         durationMin: { type: 'number', description: 'Dauer in Minuten' },
         calories: { type: 'number', description: 'Verbrannte Kalorien in kcal' },
+        date: { type: 'string', description: 'Tag im Format YYYY-MM-DD (optional)' },
       },
       required: ['name', 'calories'],
     },

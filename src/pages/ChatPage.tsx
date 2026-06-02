@@ -3,14 +3,18 @@ import { useStore } from '../store/useStore';
 import { runChat } from '../lib/claude';
 import type { ExerciseToolInput, FoodToolInput } from '../lib/claude';
 import {
+  DIET_LABELS,
   bmr,
   dailyBudget,
   maintenance,
-  sumCalories,
-  sumMacros,
+  sumNutrients,
   targetMacros,
 } from '../lib/calc';
 import { formatDateLabel } from '../lib/date';
+import { MEALS } from '../types';
+import type { MealType } from '../types';
+
+const isDateKey = (s: unknown): s is string => typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s);
 
 export default function ChatPage({ goToProfile }: { goToProfile: () => void }) {
   const { profile, goal, settings, selectedDate } = useStore();
@@ -36,44 +40,67 @@ export default function ChatPage({ goToProfile }: { goToProfile: () => void }) {
     const day = s.days[selectedDate] ?? { date: selectedDate, foods: [], exercises: [] };
     const burned = Math.round(day.exercises.reduce((a, e) => a + (e.calories || 0), 0));
     const budget = dailyBudget(profile, goal, burned);
-    const eaten = sumMacros(day.foods);
-    const consumed = sumCalories(day.foods);
+    const t = sumNutrients(day.foods);
     const target = targetMacros(budget, goal);
+    const name = profile.name?.trim();
     return [
       'Du bist der Ernährungs-Assistent der App "Essen", ein Kalorien- und Makrotracker.',
       'Antworte kurz, freundlich und auf Deutsch. Verwende metrische Einheiten (g, kcal).',
       'Wenn der Nutzer beschreibt, was er gegessen oder an Sport gemacht hat, trage es mit den ' +
         'passenden Tools (add_food / add_exercise) ein und bestätige danach knapp, was du erfasst hast.',
-      'Schätze fehlende Nährwerte realistisch. Frage nur nach, wenn die Angabe wirklich unklar ist.',
+      'Ordne jedem Lebensmittel eine Mahlzeit zu (breakfast/lunch/dinner/snack) und schätze fehlende ' +
+        'Nährwerte realistisch – inkl. Zucker, gesättigten Fettsäuren, Ballaststoffen und Salz. ' +
+        'Frage nur nach, wenn die Angabe wirklich unklar ist.',
+      'Berücksichtige bei Vorschlägen die Vorlieben/Abneigungen und den Ernährungsstil des Nutzers.',
       '',
-      `Aktueller Tag: ${formatDateLabel(selectedDate)} (${selectedDate}).`,
+      name ? `Der Nutzer heißt ${name}.` : '',
+      `Aktueller Tag: ${formatDateLabel(selectedDate)} (${selectedDate}). Für andere Tage date=YYYY-MM-DD setzen.`,
       `Profil: ${profile.sex === 'male' ? 'männlich' : 'weiblich'}, ${profile.age} Jahre, ` +
-        `${profile.height} cm, ${profile.weight} kg.`,
+        `${profile.height} cm, ${profile.weight} kg` +
+        (profile.targetWeight ? `, Wunschgewicht ${profile.targetWeight} kg` : '') +
+        '.',
+      `Ernährungsstil: ${DIET_LABELS[goal.dietStyle]}.`,
+      goal.preferences?.trim() ? `Vorlieben/Hinweise: ${goal.preferences.trim()}` : '',
       `Grundumsatz: ${bmr(profile)} kcal, Erhaltungsbedarf: ${maintenance(profile)} kcal.`,
-      `Tagesbudget: ${budget} kcal. Bereits gegessen: ${consumed} kcal ` +
-        `(Eiweiß ${eaten.protein} g, KH ${eaten.carbs} g, Fett ${eaten.fat} g).`,
-      `Ziel-Makros: Eiweiß ${target.protein} g, KH ${target.carbs} g, Fett ${target.fat} g.`,
-      `Restbudget: ${budget - consumed} kcal.`,
-    ].join('\n');
+      `Tagesbudget: ${budget} kcal. Bereits gegessen: ${t.calories} kcal ` +
+        `(Eiweiß ${t.protein} g, KH ${t.carbs} g, Fett ${t.fat} g, Ballaststoffe ${t.fiber} g, ` +
+        `Zucker ${t.sugar} g, Salz ${t.salt} g).`,
+      `Ziel-Makros: Eiweiß ${target.protein} g, KH ${target.carbs} g, Fett ${target.fat} g. ` +
+        `Ballaststoff-Ziel ${goal.fiberGoal} g; Limits: Zucker ${goal.sugarLimit} g, ` +
+        `Salz ${goal.saltLimit} g, ges. FS ${goal.satFatLimit} g.`,
+      `Restbudget: ${budget - t.calories} kcal.`,
+    ]
+      .filter(Boolean)
+      .join('\n');
   }
 
   function makeHandlers() {
     return {
       addFood: (f: FoodToolInput) => {
-        addFood(selectedDate, {
+        const date = isDateKey(f.date) ? f.date : selectedDate;
+        const meal: MealType = f.meal ?? 'snack';
+        addFood(date, {
           name: f.name,
+          meal,
           quantity: f.quantity,
           calories: Math.round(f.calories),
           protein: Math.round(f.protein),
           carbs: Math.round(f.carbs),
+          sugar: Math.round(f.sugar ?? 0),
           fat: Math.round(f.fat),
+          saturatedFat: Math.round(f.saturatedFat ?? 0),
+          fiber: Math.round(f.fiber ?? 0),
+          salt: Math.round((f.salt ?? 0) * 10) / 10,
+          note: f.note,
+          source: 'chat',
         });
-        return `Eingetragen: ${f.name} (${Math.round(f.calories)} kcal, E ${Math.round(
+        return `Eingetragen: ${f.name} (${MEALS[meal].label}, ${Math.round(f.calories)} kcal, E ${Math.round(
           f.protein
         )} / KH ${Math.round(f.carbs)} / F ${Math.round(f.fat)} g).`;
       },
       addExercise: (e: ExerciseToolInput) => {
-        addExercise(selectedDate, {
+        const date = isDateKey(e.date) ? e.date : selectedDate;
+        addExercise(date, {
           name: e.name,
           durationMin: e.durationMin,
           calories: Math.round(e.calories),

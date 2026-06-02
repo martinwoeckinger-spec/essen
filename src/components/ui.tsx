@@ -41,21 +41,29 @@ export function CalorieRing({
   );
 }
 
-/** Makro-Balken mit Ziel-Markierung. */
+/**
+ * Fortschritts-/Ziel-Balken.
+ * - `limit=false` (Ziel): voller Balken ist gut.
+ * - `limit=true` (Obergrenze, z.B. Zucker/Salz): Überschreiten wird rot.
+ */
 export function MacroBar({
   label,
   value,
   target,
   color,
   unit = 'g',
+  limit = false,
 }: {
   label: string;
   value: number;
   target: number;
   color: string;
   unit?: string;
+  limit?: boolean;
 }) {
   const frac = target > 0 ? Math.min(value / target, 1) : 0;
+  const over = target > 0 && value > target;
+  const fill = limit && over ? 'var(--danger)' : color;
   return (
     <div className="macro">
       <div className="macro-head">
@@ -64,13 +72,72 @@ export function MacroBar({
           {value}
           <span className="muted">
             {' '}
-            / {target} {unit}
+            {limit ? 'max.' : '/'} {target} {unit}
           </span>
+          {limit && over && <span className="warn-tag"> ⚠</span>}
         </span>
       </div>
       <div className="bar">
-        <div className="bar-fill" style={{ width: `${frac * 100}%`, background: color }} />
+        <div className="bar-fill" style={{ width: `${frac * 100}%`, background: fill }} />
       </div>
+    </div>
+  );
+}
+
+/** Generisches Tagesbalken-Diagramm (Zeitverlauf einer Kennzahl). */
+export function DayBars({
+  data,
+  unit = '',
+}: {
+  data: { key: string; value: number; ref?: number; over?: boolean }[];
+  unit?: string;
+}) {
+  const max = Math.max(...data.map((d) => Math.max(d.value, d.ref ?? 0)), 1);
+  return (
+    <div className="chart">
+      {data.map((d) => {
+        const h = (d.value / max) * 100;
+        const refH = d.ref != null ? (d.ref / max) * 100 : null;
+        return (
+          <div
+            className="chart-col"
+            key={d.key}
+            title={`${d.key}: ${d.value}${unit}${d.ref != null ? ` (Ziel ${d.ref}${unit})` : ''}`}
+          >
+            <div className="chart-bar-wrap">
+              {refH != null && <div className="budget-line" style={{ bottom: `${Math.min(refH, 100)}%` }} />}
+              <div
+                className={`chart-bar ${d.over ? 'over' : ''}`}
+                style={{ height: `${Math.min(h, 100)}%` }}
+              />
+            </div>
+            <div className="chart-label">{d.key.slice(8)}</div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/** Vollflächiges Overlay (für den strukturierten Import). */
+export function Overlay({
+  title,
+  onClose,
+  children,
+}: {
+  title: string;
+  onClose: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <div className="overlay" role="dialog" aria-modal="true">
+      <div className="overlay-head">
+        <h2>{title}</h2>
+        <button className="chip" onClick={onClose}>
+          ✕ Schließen
+        </button>
+      </div>
+      <div className="overlay-body">{children}</div>
     </div>
   );
 }

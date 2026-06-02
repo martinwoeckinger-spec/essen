@@ -7,6 +7,10 @@ import {
   targetMacros,
   sumCalories,
   sumMacros,
+  sumNutrients,
+  mealTotals,
+  weeklyWeightChange,
+  weeksToTarget,
   caloriesFromMacros,
 } from './calc';
 import type { FoodEntry, Goal, Profile } from '../types';
@@ -40,10 +44,16 @@ function food(partial: Partial<FoodEntry>): FoodEntry {
   return {
     id: 'x',
     name: 'Test',
+    meal: 'snack',
     calories: 0,
     protein: 0,
     carbs: 0,
+    sugar: 0,
     fat: 0,
+    saturatedFat: 0,
+    fiber: 0,
+    salt: 0,
+    source: 'manual',
     time: '2026-01-01T00:00:00.000Z',
     ...partial,
   };
@@ -154,5 +164,85 @@ describe('Summen über Tageseinträge', () => {
 describe('caloriesFromMacros', () => {
   it('rechnet Gramm in Kalorien um (4/4/9)', () => {
     expect(caloriesFromMacros({ protein: 50, carbs: 100, fat: 30 })).toBe(50 * 4 + 100 * 4 + 30 * 9);
+  });
+});
+
+describe('sumNutrients', () => {
+  const foods: FoodEntry[] = [
+    food({ calories: 260, protein: 14, carbs: 19, sugar: 19, fat: 14, saturatedFat: 9, fiber: 0, salt: 0.4 }),
+    food({ calories: 52, protein: 1, carbs: 12, sugar: 4, fat: 1, saturatedFat: 0, fiber: 7, salt: 0 }),
+  ];
+
+  it('summiert alle erweiterten Nährwerte', () => {
+    expect(sumNutrients(foods)).toEqual({
+      calories: 312,
+      protein: 15,
+      carbs: 31,
+      sugar: 23,
+      fat: 15,
+      saturatedFat: 9,
+      fiber: 7,
+      salt: 0.4,
+    });
+  });
+
+  it('rundet Salz auf eine Nachkommastelle', () => {
+    const t = sumNutrients([food({ salt: 0.15 }), food({ salt: 0.2 })]);
+    expect(t.salt).toBe(0.4); // 0.35 -> 0.4 (round)
+  });
+
+  it('liefert Nullwerte für eine leere Liste', () => {
+    expect(sumNutrients([])).toEqual({
+      calories: 0, protein: 0, carbs: 0, sugar: 0, fat: 0, saturatedFat: 0, fiber: 0, salt: 0,
+    });
+  });
+});
+
+describe('mealTotals', () => {
+  it('gruppiert die Nährwerte nach Mahlzeit', () => {
+    const foods: FoodEntry[] = [
+      food({ meal: 'breakfast', calories: 300, protein: 20 }),
+      food({ meal: 'breakfast', calories: 100, protein: 5 }),
+      food({ meal: 'lunch', calories: 600, protein: 40 }),
+    ];
+    const t = mealTotals(foods);
+    expect(t.breakfast.calories).toBe(400);
+    expect(t.breakfast.protein).toBe(25);
+    expect(t.lunch.calories).toBe(600);
+    expect(t.dinner.calories).toBe(0);
+    expect(t.snack.calories).toBe(0);
+  });
+});
+
+describe('weeklyWeightChange', () => {
+  it('rechnet ein Defizit in kg/Woche um (~7700 kcal/kg)', () => {
+    // -500 * 7 / 7700 = -0.4545 -> -0.5
+    expect(weeklyWeightChange(-500)).toBe(-0.5);
+  });
+  it('ist 0 ohne Anpassung', () => {
+    expect(weeklyWeightChange(0)).toBe(0);
+  });
+});
+
+describe('weeksToTarget', () => {
+  const base: Profile = { sex: 'male', age: 30, height: 180, weight: 90, activity: 'light' };
+  const goal: Goal = {
+    mode: 'lose', adjustment: -500, proteinPct: 30, carbsPct: 40, fatPct: 30,
+    addExerciseToBudget: true, dietStyle: 'omnivore', fiberGoal: 30, sugarLimit: 50,
+    saltLimit: 6, satFatLimit: 20, preferences: '',
+  };
+
+  it('schätzt die Wochen bis zum Wunschgewicht', () => {
+    // 90 -> 80 = 10 kg, bei 0.5 kg/Woche => 20 Wochen
+    expect(weeksToTarget({ ...base, targetWeight: 80 }, goal)).toBe(20);
+  });
+
+  it('liefert null, wenn kein Wunschgewicht gesetzt ist', () => {
+    expect(weeksToTarget(base, goal)).toBeNull();
+  });
+
+  it('liefert null, wenn die Richtung nicht zum Ziel passt', () => {
+    // Defizit, aber Wunschgewicht über dem aktuellen Gewicht
+    expect(weeksToTarget({ ...base, targetWeight: 95 }, goal)).toBeNull();
   });
 });
