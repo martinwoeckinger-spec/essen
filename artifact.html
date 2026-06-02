@@ -3,15 +3,16 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+<meta name="theme-color" content="#0a0a0a" />
 <title>Essen – Kalorientracker</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.26.0/babel.min.js"></script>
 <style>
   :root{
-    --bg:#0f172a;--bg2:#1e293b;--card:#1e293b;--card2:#273449;--text:#f1f5f9;--muted:#94a3b8;
-    --accent:#16a34a;--accent2:#22c55e;--danger:#ef4444;--track:#334155;
-    --protein:#f59e0b;--carbs:#38bdf8;--fat:#f472b6;--radius:16px;
+    --bg:#0a0a0a;--bg2:#111111;--card:#171717;--card2:#242424;--text:#fafafa;--muted:#9ca3af;
+    --accent:#f97316;--accent2:#fb923c;--danger:#ef4444;--track:#2c2c2c;
+    --protein:#f97316;--carbs:#facc15;--fat:#fb7185;--radius:14px;
     --safe-bottom:env(safe-area-inset-bottom,0px);--safe-top:env(safe-area-inset-top,0px);
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -110,7 +111,7 @@
   .num-static{background:var(--bg);border:1px solid var(--track);border-radius:10px;padding:11px 12px;color:var(--muted)}
   .presets{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
   .preset{background:var(--card2);border:1px solid transparent;color:var(--text);padding:9px 12px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer}
-  .preset.on{border-color:var(--accent2);background:#14321f}
+  .preset.on{border-color:var(--accent2);background:rgba(249,115,22,.18)}
   .toggle{display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer}
   .toggle input{width:20px;height:20px;accent-color:var(--accent)}
   .pct{margin-bottom:14px}.pct-head{display:flex;justify-content:space-between;font-size:14px;margin-bottom:4px;font-weight:600}
@@ -160,6 +161,42 @@
   .archive-wd{font-size:11px;color:var(--muted)}.archive-label{font-weight:700}
   .archive-meta{flex:1;min-width:0}
   .archive-kcal{font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+  /* ---------- Brand / Layout-Bausteine ---------- */
+  .brand{display:none}
+  .cols{display:flex;flex-direction:column;gap:14px}
+  .col{display:flex;flex-direction:column;gap:14px;min-width:0}
+  .overlay-card{display:flex;flex-direction:column;flex:1;min-height:0}
+  @media (hover:hover){
+    .chip:hover,.preset:hover,.nav-btn:hover,.metric-chip:hover,.seg button:hover{filter:brightness(1.18)}
+    .primary:hover{filter:brightness(1.08)}
+    .del:hover{color:var(--danger)}
+    .archive-open:hover{background:var(--card2)}
+  }
+  /* ---------- Desktop ---------- */
+  @media (min-width:900px){
+    body{font-size:15px}
+    .app{flex-direction:row;max-width:1180px;height:100vh}
+    .tabbar{order:-1;flex-direction:column;width:236px;flex:0 0 236px;border-top:none;border-right:1px solid var(--card2);padding:18px 14px;gap:4px;align-items:stretch}
+    .brand{display:flex;align-items:center;gap:10px;padding:4px 12px 18px;font-weight:800;font-size:20px}
+    .brand-icon{font-size:24px}
+    .tab{flex:none;flex-direction:row;justify-content:flex-start;gap:12px;padding:11px 14px;border-radius:12px}
+    .tab-icon{font-size:20px}
+    .tab-label{font-size:14px;font-weight:600}
+    .tab.active{background:var(--card);color:var(--accent2)}
+    .page{max-width:880px;margin:0 auto;padding:28px 28px 44px}
+    .page-today{max-width:1060px}
+    .page-today .cols{display:grid;grid-template-columns:340px 1fr;gap:18px;align-items:start}
+    .datebar-label{font-size:22px}
+    .overlay{align-items:flex-start;justify-content:center;background:rgba(0,0,0,.65);max-width:none;margin:0;padding:48px 16px}
+    .overlay-card{flex:none;width:100%;max-width:760px;max-height:84vh;background:var(--bg2);border:1px solid var(--card2);border-radius:16px;overflow:hidden}
+    .overlay-head{padding:16px 18px}
+    .overlay-body{padding:16px 18px 24px}
+  }
+  @media (min-width:1280px){
+    .app{max-width:1320px}
+    .page-today{max-width:1160px}
+    .page-today .cols{grid-template-columns:360px 1fr}
+  }
 </style>
 </head>
 <body>
@@ -376,8 +413,12 @@ const DayBars=({data,unit=''})=>{
 };
 const Stat=({label,value,sub})=>(<div className="stat"><div className="stat-value">{value}</div><div className="stat-label">{label}</div>{sub&&<div className="stat-sub">{sub}</div>}</div>);
 const Overlay=({title,onClose,children})=>(
-  <div className="overlay"><div className="overlay-head"><h2>{title}</h2><button className="chip" onClick={onClose}>✕ Schließen</button></div>
-    <div className="overlay-body">{children}</div></div>);
+  <div className="overlay" onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
+    <div className="overlay-card">
+      <div className="overlay-head"><h2>{title}</h2><button className="chip" onClick={onClose}>✕ Schließen</button></div>
+      <div className="overlay-body">{children}</div>
+    </div>
+  </div>);
 
 /* ---------- Import-Overlay ---------- */
 function ImportPanel({setState,setDate,onClose}){
@@ -476,12 +517,14 @@ function Today({state,setState,date,setDate,openImport}){
   const rmEx=id=>setState(s=>{const d=s.days[date];if(!d)return s;return{...s,days:{...s.days,[date]:{...d,exercises:d.exercises.filter(x=>x.id!==id)}}};});
 
   return (
-    <div className="page">
+    <div className="page page-today">
       <header className="datebar">
         <button className="nav-btn" onClick={()=>setDate(addDays(date,-1))}>‹</button>
         <div className="datebar-label">{dateLabel(date)}</div>
         <button className="nav-btn" onClick={()=>setDate(addDays(date,1))} disabled={date>=todayKey()}>›</button>
       </header>
+      <div className="cols">
+      <div className="col">
       <section className="card hero">
         <Ring consumed={consumed} budget={budget}/>
         <div className="hero-stats">
@@ -510,6 +553,8 @@ function Today({state,setState,date,setDate,openImport}){
         <div className="energy-row"><span>± Ziel-Anpassung</span><strong>{goal.adjustment>0?'+':''}{goal.adjustment} kcal</strong></div>
         <div className="energy-row total"><span>= Tagesbudget</span><strong>{budget} kcal</strong></div>
       </section>
+      </div>
+      <div className="col">
       <section className="card">
         <div className="section-head"><h3 className="card-title">Mahlzeiten</h3>
           <div className="section-actions">
@@ -550,6 +595,8 @@ function Today({state,setState,date,setDate,openImport}){
             <button className="del" onClick={()=>rmEx(e.id)}>×</button>
           </li>))}</ul>
       </section>
+      </div>
+      </div>
     </div>
   );
 }
@@ -864,9 +911,12 @@ function App(){
         {tab==='archive' && <Archive state={state} setState={setState} setDate={setDate} goToToday={()=>setTab('today')} openImport={()=>setImportOpen(true)}/>}
         {tab==='profile' && <Profile state={state} setState={setState}/>}
       </main>
-      <nav className="tabbar">{TABS.map(t=>(
+      <nav className="tabbar">
+        <div className="brand"><span className="brand-icon">🍊</span><span className="brand-name">Essen</span></div>
+        {TABS.map(t=>(
         <button key={t.id} className={'tab'+(tab===t.id?' active':'')} onClick={()=>setTab(t.id)}>
-          <span className="tab-icon">{t.icon}</span><span className="tab-label">{t.label}</span></button>))}</nav>
+          <span className="tab-icon">{t.icon}</span><span className="tab-label">{t.label}</span></button>))}
+      </nav>
       {importOpen && <ImportPanel setState={setState} setDate={setDate} onClose={()=>setImportOpen(false)}/>}
     </div>
   );

@@ -73,6 +73,11 @@ Erfassung der Mahlzeiten erfolgt per **Copy & Paste** (strukturierter Import)
 oder manuell; dazu Mahlzeiten-Gruppierung, erweiterte Nährwerte, Archiv,
 Analysen und Profil.
 
+> **Desktop-optimiert:** Auf breiten Bildschirmen erscheint eine
+> Seitenleisten-Navigation, ein breites Layout und eine zweispaltige
+> Tagesansicht (Dialoge als zentrierte Modals); auf dem Handy bleibt die untere
+> Tableiste. Farbschema: **Schwarz/Orange**.
+
 - **Kein API-Key, kein KI-Chat, keine automatischen Vorschläge** – einfach die
   Datei im Browser öffnen.
 - Lediglich React/Babel werden beim ersten Laden per CDN geholt; alle Daten
