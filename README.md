@@ -6,14 +6,43 @@ hinzufügen wie eine native App. Alle Daten bleiben lokal auf dem Gerät.
 
 ## Funktionen
 
-- **Tageserfassung** – Mahlzeiten & Sport pro Tag, mit Tagesnavigation
-- **KI-Chat** – natürlichsprachlich eintragen: _„2 Scheiben Vollkornbrot mit Käse"_
-  → Claude schätzt Kalorien + Makros und trägt sie ein (Tool-Use)
-- **Makro-Auswertung** – Eiweiß / Kohlenhydrate / Fett mit Zielbalken
-- **Grundumsatz** (Mifflin-St Jeor) und **Erhaltungsbedarf** aus deinem Profil
-- **Sportumsatz** – verbrannte Kalorien erfassen, optional zum Budget addieren
+- **Strukturierter Import** – Nahrungsmittel als Tabelle (Tab- oder
+  `|`-getrennt) einfügen; **Datum und Mahlzeit werden automatisch zugeordnet**.
+  Mit Vorschau, Warnungen für fehlerhafte Zeilen und optionalem Leeren der
+  betroffenen Tage. Deutsche Zahlen (`0,4`) und Notizen mit Kommas inklusive.
+- **Tageserfassung nach Mahlzeiten** – Frühstück / Mittag / Abend / Snack,
+  je mit Zwischensumme; dazu Sport, mit Tagesnavigation
+- **Erweiterte Nährwerte** – zusätzlich zu kcal/Makros auch **Zucker,
+  gesättigte Fettsäuren, Ballaststoffe und Salz**, mit Ziel-/Limit-Balken
+- **Archiv** – alle erfassten Tage nach Monat gruppiert, antippen zum Öffnen,
+  Export zurück ins Tab-Format (Backup / Round-Trip)
+- **Analyse** – umschaltbarer **Zeitverlauf** (Kalorien, Makros, Ballaststoffe,
+  Zucker, Salz), erweiterte Durchschnitte, Verteilung nach Mahlzeit und
+  Tracking-Treue (erfasste Tage, Budget-Treue, Serie)
+- **Profil & Wünsche** – Körperdaten, Wunschgewicht inkl. Tempo-/Dauer­schätzung,
+  Ernährungsstil, Nährwert-Ziele/-Limits sowie Vorlieben/Hinweise
+- **KI-Chat** – natürlichsprachlich eintragen: _„Zum Frühstück 400 g Joghurt
+  mit Himbeeren"_ → Claude ordnet Mahlzeit zu, schätzt die Nährwerte und trägt
+  sie ein (Tool-Use), auch für andere Tage
+- **Grundumsatz** (Mifflin-St Jeor), **Erhaltungsbedarf** und **Sportumsatz**
 - **Vorschläge** – die KI schlägt Mahlzeiten für die fehlenden Tageskalorien vor
-- **Verlauf** – 7/14/30-Tage-Diagramm und Durchschnittswerte
+
+### Strukturierter Import – Spaltenformat
+
+Eine Zeile pro Lebensmittel, Spalten per **Tab** (oder `|`) getrennt:
+
+```
+Datum  Mahlzeit  Nahrungsmittel  Menge  kcal  Eiweiß  KH  Zucker  Fett  ges.FS  Ballaststoffe  Salz  Notiz
+```
+
+Beispiel:
+
+```
+02.06.2026	Frühstück	Naturjoghurt	400 g	260	14	19	19	14	9	0	0,4	Vollmilchjoghurt 3,5%
+02.06.2026	Mittagessen	Chicken-Panade-Salat	1 Portion	550	35	30	5	30	6	5	1,5	Restaurantportion
+```
+
+Aufrufbar über **„📋 Import"** auf der Heute- oder Archiv-Seite.
 
 ## Schnellstart
 
@@ -37,8 +66,10 @@ Unterordner funktioniert.
 
 ## Variante ohne API-Key: `artifact.html`
 
-Neben der vollen PWA gibt es **`artifact.html`** – die komplette App in einer
-einzigen Datei, ganz ohne Build-Schritt:
+Neben der vollen PWA gibt es **`artifact.html`** – die komplette App mit dem
+gleichen Funktionsumfang (strukturierter Import, Mahlzeiten, erweiterte
+Nährwerte, Archiv, Analysen, Profil) in einer einzigen Datei, ganz ohne
+Build-Schritt:
 
 - **Als Claude-Artefakt** (Inhalt der Datei in einen Claude-Chat geben): Der
   KI-Chat läuft dann über die eingebaute Claude-Laufzeit (`window.claude.complete`)
