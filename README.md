@@ -21,11 +21,12 @@ hinzufügen wie eine native App. Alle Daten bleiben lokal auf dem Gerät.
   Tracking-Treue (erfasste Tage, Budget-Treue, Serie)
 - **Profil & Wünsche** – Körperdaten, Wunschgewicht inkl. Tempo-/Dauer­schätzung,
   Ernährungsstil, Nährwert-Ziele/-Limits sowie Vorlieben/Hinweise
-- **KI-Chat** – natürlichsprachlich eintragen: _„Zum Frühstück 400 g Joghurt
-  mit Himbeeren"_ → Claude ordnet Mahlzeit zu, schätzt die Nährwerte und trägt
-  sie ein (Tool-Use), auch für andere Tage
+- **KI-Chat** _(nur PWA)_ – natürlichsprachlich eintragen: _„Zum Frühstück 400 g
+  Joghurt mit Himbeeren"_ → Claude ordnet Mahlzeit zu, schätzt die Nährwerte und
+  trägt sie ein (Tool-Use), auch für andere Tage
 - **Grundumsatz** (Mifflin-St Jeor), **Erhaltungsbedarf** und **Sportumsatz**
-- **Vorschläge** – die KI schlägt Mahlzeiten für die fehlenden Tageskalorien vor
+- **Vorschläge** _(nur PWA)_ – die KI schlägt Mahlzeiten für die fehlenden
+  Tageskalorien vor
 
 ### Strukturierter Import – Spaltenformat
 
@@ -64,23 +65,21 @@ beliebigen Webspace, Netlify, Vercel, GitHub Pages o.ä. geladen werden.
 `base: './'` in `vite.config.ts` sorgt dafür, dass die App auch in einem
 Unterordner funktioniert.
 
-## Variante ohne API-Key: `artifact.html`
+## Single-File-Variante ohne KI: `artifact.html`
 
-Neben der vollen PWA gibt es **`artifact.html`** – die komplette App mit dem
-gleichen Funktionsumfang (strukturierter Import, Mahlzeiten, erweiterte
-Nährwerte, Archiv, Analysen, Profil) in einer einzigen Datei, ganz ohne
-Build-Schritt:
+Neben der vollen PWA gibt es **`artifact.html`** – ein **reiner Offline-Tracker
+in einer einzigen Datei**, ganz ohne Build-Schritt und **ohne KI/API**. Die
+Erfassung der Mahlzeiten erfolgt per **Copy & Paste** (strukturierter Import)
+oder manuell; dazu Mahlzeiten-Gruppierung, erweiterte Nährwerte, Archiv,
+Analysen und Profil.
 
-- **Als Claude-Artefakt** (Inhalt der Datei in einen Claude-Chat geben): Der
-  KI-Chat läuft dann über die eingebaute Claude-Laufzeit (`window.claude.complete`)
-  – **kein API-Key nötig**.
-- **Standalone**: Datei einfach im Browser öffnen. Tracking, Makros, Grund-/
-  Sportumsatz und Auswertung funktionieren komplett ohne Key. Für den KI-Chat
-  kann optional ein Anthropic-Key im Profil hinterlegt werden.
+- **Kein API-Key, kein KI-Chat, keine automatischen Vorschläge** – einfach die
+  Datei im Browser öffnen.
+- Lediglich React/Babel werden beim ersten Laden per CDN geholt; alle Daten
+  bleiben lokal im Browser (`localStorage`).
 
-> Hinweis: In der Artefakt-Sandbox werden Daten ggf. nicht dauerhaft gespeichert
-> (kein persistenter `localStorage`). Standalone/als PWA bleiben die Daten lokal
-> erhalten.
+> KI-Chat und automatische Mahlzeit-Vorschläge gibt es nur in der **PWA**
+> (mit eigenem Anthropic-API-Key, siehe unten).
 
 ## KI-Chat einrichten (PWA-Variante)
 

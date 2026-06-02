@@ -285,9 +285,7 @@ const IMPORT_EXAMPLE=[
 const DEFAULTS = {
   profile:{name:'',sex:'male',age:30,height:180,weight:80,targetWeight:null,activity:'light'},
   goal:{adjustment:0,proteinPct:30,carbsPct:40,fatPct:30,addExercise:true,dietStyle:'omnivore',fiberGoal:30,sugarLimit:50,saltLimit:6,satFatLimit:20,preferences:''},
-  settings:{apiKey:'',model:'claude-sonnet-4-6'},
   days:{},
-  chat:[],
 };
 function migrateDays(days){
   const out={};
@@ -305,9 +303,7 @@ function load(){
       return {
         profile:{...DEFAULTS.profile,...(p.profile||{})},
         goal:{...DEFAULTS.goal,...(p.goal||{})},
-        settings:{...DEFAULTS.settings,...(p.settings||{})},
         days:migrateDays(p.days),
-        chat:p.chat||[],
       };
     }
   }catch(e){}
@@ -335,30 +331,6 @@ function importEntries(setState,rows,replace){
     });
     return {...s,days};
   });
-}
-
-const HAS_AI = typeof window!=='undefined' && window.claude && typeof window.claude.complete==='function';
-async function getCompletion(prompt, settings){
-  if(HAS_AI) return await window.claude.complete(prompt);
-  if(settings.apiKey){
-    const res = await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'content-type':'application/json','x-api-key':settings.apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:settings.model,max_tokens:1500,messages:[{role:'user',content:prompt}]}),
-    });
-    if(!res.ok) throw new Error('API '+res.status+': '+(await res.text()).slice(0,160));
-    const data = await res.json();
-    return (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
-  }
-  throw new Error('Keine KI verfügbar. Öffne die App als Claude-Artefakt (kein Key nötig) oder trage im Profil einen API-Key ein.');
-}
-function extractJSON(text){
-  let t=(text||'').trim();
-  const fence=t.match(/```(?:json)?\s*([\s\S]*?)```/);
-  if(fence)t=fence[1].trim();
-  const s=t.indexOf('{'),e=t.lastIndexOf('}');
-  if(s>=0&&e>s)t=t.slice(s,e+1);
-  return JSON.parse(t);
 }
 
 /* ---------- UI-Bausteine ---------- */
@@ -493,13 +465,12 @@ function ImportPanel({setState,setDate,onClose}){
 }
 
 /* ---------- Heute ---------- */
-function Today({state,setState,date,setDate,goToChat,openImport,suggest}){
+function Today({state,setState,date,setDate,openImport}){
   const {profile,goal}=state;
   const day=state.days[date]||{date,foods:[],exercises:[]};
   const totals=sumNut(day.foods), consumed=totals.calories;
   const burned=Math.round(day.exercises.reduce((a,e)=>a+(+e.calories||0),0));
   const budget=dailyBudget(profile,goal,burned), target=targetMacros(budget,goal);
-  const remaining=budget-consumed;
   const [openF,setOpenF]=useState(false),[openE,setOpenE]=useState(false);
   const rmFood=id=>setState(s=>{const d=s.days[date];if(!d)return s;return{...s,days:{...s.days,[date]:{...d,foods:d.foods.filter(x=>x.id!==id)}}};});
   const rmEx=id=>setState(s=>{const d=s.days[date];if(!d)return s;return{...s,days:{...s.days,[date]:{...d,exercises:d.exercises.filter(x=>x.id!==id)}}};});
@@ -539,15 +510,10 @@ function Today({state,setState,date,setDate,goToChat,openImport,suggest}){
         <div className="energy-row"><span>± Ziel-Anpassung</span><strong>{goal.adjustment>0?'+':''}{goal.adjustment} kcal</strong></div>
         <div className="energy-row total"><span>= Tagesbudget</span><strong>{budget} kcal</strong></div>
       </section>
-      <button className="suggest-btn" disabled={remaining<=0} onClick={()=>suggest(remaining,target,totals)}>
-        💡 {remaining>0?`Vorschläge für ${remaining} fehlende kcal`:'Budget erreicht'}
-      </button>
-
       <section className="card">
         <div className="section-head"><h3 className="card-title">Mahlzeiten</h3>
           <div className="section-actions">
             <button className="chip" onClick={openImport}>📋 Import</button>
-            <button className="chip" onClick={goToChat}>💬 Chat</button>
             <button className="chip" onClick={()=>setOpenF(o=>!o)}>{openF?'✕':'+ manuell'}</button>
           </div></div>
         {openF && <FoodForm onSubmit={f=>{addFoodTo(setState,date,f);setOpenF(false);}}/>}
@@ -572,7 +538,6 @@ function Today({state,setState,date,setDate,goToChat,openImport,suggest}){
       <section className="card">
         <div className="section-head"><h3 className="card-title">Sport</h3>
           <div className="section-actions">
-            <button className="chip" onClick={goToChat}>💬 Chat</button>
             <button className="chip" onClick={()=>setOpenE(o=>!o)}>{openE?'✕':'+ manuell'}</button>
           </div></div>
         {openE && <ExerciseForm onSubmit={e=>{addExTo(setState,date,e);setOpenE(false);}}/>}
@@ -632,83 +597,6 @@ function ExerciseForm({onSubmit}){
       </div>
       <button type="submit" className="primary">Hinzufügen</button>
     </form>
-  );
-}
-
-/* ---------- Chat ---------- */
-const isDateKey = s => typeof s==='string' && /^\d{4}-\d{2}-\d{2}$/.test(s);
-function Chat({state,setState,date,goToProfile,pending,clearPending}){
-  const [input,setInput]=useState('');
-  const [busy,setBusy]=useState(false);
-  const [err,setErr]=useState(null);
-  const scroll=useRef(null);
-  useEffect(()=>{scroll.current&&scroll.current.scrollTo({top:scroll.current.scrollHeight,behavior:'smooth'});},[state.chat,busy]);
-  const push=m=>setState(s=>({...s,chat:[...s.chat,m]}));
-  const snapRef=useRef(state); snapRef.current=state;
-
-  async function send(text){
-    text=(text||'').trim(); if(!text||busy)return; setErr(null);
-    const cur=snapRef.current;
-    const day=cur.days[date]||{foods:[],exercises:[]};
-    const burned=Math.round(day.exercises.reduce((a,e)=>a+(+e.calories||0),0));
-    const budget=dailyBudget(cur.profile,cur.goal,burned), t=sumNut(day.foods), tgt=targetMacros(budget,cur.goal);
-    const history=cur.chat.slice(-6).map(m=>`${m.role==='user'?'Nutzer':'Assistent'}: ${m.content}`).join('\n');
-    push({role:'user',content:text}); setInput(''); setBusy(true);
-    const name=(cur.profile.name||'').trim();
-    const prompt=
-`Du bist der Ernährungs-Assistent der App "Essen" (Kalorien- und Makrotracker). Antworte freundlich und kurz auf Deutsch.
-${name?('Der Nutzer heißt '+name+'. '):''}Aktueller Tag: ${dateLabel(date)} (${date}). Für andere Tage date=YYYY-MM-DD setzen.
-Profil: ${cur.profile.sex==='male'?'männlich':'weiblich'}, ${cur.profile.age} J, ${cur.profile.height} cm, ${cur.profile.weight} kg${cur.profile.targetWeight?(', Wunschgewicht '+cur.profile.targetWeight+' kg'):''}.
-Ernährungsstil: ${DIET_LABELS[cur.goal.dietStyle]}.${cur.goal.preferences?(' Vorlieben/Hinweise: '+cur.goal.preferences+'.'):''}
-Grundumsatz ${bmr(cur.profile)} kcal, Erhaltung ${maintenance(cur.profile)} kcal. Tagesbudget ${budget} kcal, Restbudget ${budget-t.calories} kcal.
-Bereits gegessen ${t.calories} kcal (E ${t.protein}/KH ${t.carbs}/F ${t.fat} g, Ballaststoffe ${t.fiber} g, Zucker ${t.sugar} g, Salz ${t.salt} g).
-Ziel-Makros: E ${tgt.protein}/KH ${tgt.carbs}/F ${tgt.fat} g. Ballaststoff-Ziel ${cur.goal.fiberGoal} g; Limits: Zucker ${cur.goal.sugarLimit} g, Salz ${cur.goal.saltLimit} g, ges. FS ${cur.goal.satFatLimit} g.
-${history?('Bisheriger Verlauf:\n'+history+'\n'):''}
-Neue Nutzernachricht: "${text}"
-
-Wenn der Nutzer beschreibt, was er gegessen oder an Sport gemacht hat, erfasse jedes Lebensmittel/jede Aktivität einzeln, ordne eine Mahlzeit zu und schätze fehlende Nährwerte realistisch (auch Zucker, ges. Fettsäuren, Ballaststoffe, Salz). Berücksichtige bei Vorschlägen Stil und Vorlieben.
-Antworte AUSSCHLIESSLICH mit reinem JSON (keine weiteren Worte, kein Markdown), exakt in diesem Format:
-{"reply":"kurze Antwort","foods":[{"name":"","meal":"breakfast|lunch|dinner|snack","quantity":"","calories":0,"protein":0,"carbs":0,"sugar":0,"fat":0,"saturatedFat":0,"fiber":0,"salt":0,"note":"","date":"YYYY-MM-DD"}],"exercises":[{"name":"","durationMin":0,"calories":0,"date":"YYYY-MM-DD"}]}
-Lass "date" weg für den aktuellen Tag. Leere Arrays, wenn nichts einzutragen ist (z.B. bei Fragen oder Vorschlägen).`;
-    try{
-      const raw=await getCompletion(prompt,cur.settings);
-      let data; try{data=extractJSON(raw);}catch(e){data={reply:raw,foods:[],exercises:[]};}
-      (data.foods||[]).forEach(f=>{if(f&&f.name){const dt=isDateKey(f.date)?f.date:date;const meal=MEALS[f.meal]?f.meal:'snack';
-        addFoodTo(setState,dt,{name:f.name,meal,quantity:f.quantity||undefined,calories:Math.round(+f.calories||0),protein:Math.round(+f.protein||0),carbs:Math.round(+f.carbs||0),sugar:Math.round(+f.sugar||0),fat:Math.round(+f.fat||0),saturatedFat:Math.round(+f.saturatedFat||0),fiber:Math.round(+f.fiber||0),salt:Math.round((+f.salt||0)*10)/10,note:f.note||undefined,source:'chat'});}});
-      (data.exercises||[]).forEach(e=>{if(e&&e.name){const dt=isDateKey(e.date)?e.date:date;addExTo(setState,dt,{name:e.name,durationMin:e.durationMin?+e.durationMin:undefined,calories:Math.round(+e.calories||0)});}});
-      push({role:'assistant',content:data.reply||'Erledigt.'});
-    }catch(e){ setErr(e.message||String(e)); }
-    finally{ setBusy(false); }
-  }
-  useEffect(()=>{ if(pending){ const p=pending; clearPending(); send(p); } /* eslint-disable-next-line */ },[pending]);
-
-  return (
-    <div className="page chat-page">
-      <header className="chat-head">
-        <div><h2>KI-Chat</h2><span className="muted small">Tag: {dateLabel(date)}</span></div>
-        {state.chat.length>0 && <button className="chip" onClick={()=>setState(s=>({...s,chat:[]}))}>Verlauf leeren</button>}
-      </header>
-      {HAS_AI
-        ? <div className="banner ok">✨ KI aktiv – kein API-Key nötig (läuft über Claude).</div>
-        : !state.settings.apiKey && <div className="banner warn" style={{cursor:'pointer'}} onClick={goToProfile}>🔑 Kein API-Key. Als Claude-Artefakt öffnen (kein Key nötig) oder hier tippen, um einen Key im Profil einzutragen.</div>}
-      <div className="messages" ref={scroll}>
-        {state.chat.length===0 && (
-          <div className="chat-intro">
-            <p>Erzähl mir, was du gegessen hast – ich trage es ein (mit Mahlzeit & Nährwerten). Zum Beispiel:</p>
-            <div className="examples">
-              {['Zum Frühstück 400 g Naturjoghurt mit Himbeeren','Mittags ein paniertes Hähnchen mit Salat','30 Minuten joggen','Was kann ich noch essen, um auf mein Eiweißziel zu kommen?'].map(ex=>(
-                <button key={ex} className="example" onClick={()=>send(ex)}>{ex}</button>))}
-            </div>
-          </div>)}
-        {state.chat.map((m,i)=>(<div key={i} className={'msg '+m.role}>{m.content}</div>))}
-        {busy && <div className="msg assistant typing"><span className="dot"/><span className="dot"/><span className="dot"/></div>}
-      </div>
-      {err && <div className="error">{err}</div>}
-      <form className="composer" onSubmit={e=>{e.preventDefault();send(input);}}>
-        <input placeholder="Nachricht schreiben…" value={input} onChange={e=>setInput(e.target.value)} disabled={busy}/>
-        <button type="submit" className="send" disabled={busy||!input.trim()}>➤</button>
-      </form>
-    </div>
   );
 }
 
@@ -878,13 +766,10 @@ function ExportOverlay({days,onClose}){
 
 /* ---------- Profil ---------- */
 const PRESETS=[{mode:'lose',label:'Abnehmen (−500)',adj:-500},{mode:'lose',label:'Leicht abnehmen (−300)',adj:-300},{mode:'maintain',label:'Halten (±0)',adj:0},{mode:'gain',label:'Aufbauen (+300)',adj:300},{mode:'gain',label:'Aufbauen (+500)',adj:500}];
-const MODELS=[{id:'claude-haiku-4-5-20251001',label:'Haiku 4.5 – schnell & günstig'},{id:'claude-sonnet-4-6',label:'Sonnet 4.6 – ausgewogen'},{id:'claude-opus-4-8',label:'Opus 4.8 – höchste Qualität'}];
 function Profile({state,setState}){
-  const {profile,goal,settings}=state;
-  const [showKey,setShowKey]=useState(false);
+  const {profile,goal}=state;
   const setP=p=>setState(s=>({...s,profile:{...s.profile,...p}}));
   const setG=g=>setState(s=>({...s,goal:{...s.goal,...g}}));
-  const setS=st=>setState(s=>({...s,settings:{...s.settings,...st}}));
   const tgt=targetMacros(maintenance(profile)+goal.adjustment,goal);
   const macroSum=goal.proteinPct+goal.carbsPct+goal.fatPct;
   const perWeek=weeklyChange(goal.adjustment);
@@ -957,44 +842,26 @@ function Profile({state,setState}){
         <textarea className="pref-text" placeholder="z.B. vegetarisch, keine Laktose, mag kein Fisch, viel Gemüse …" value={goal.preferences} onChange={e=>setG({preferences:e.target.value})} rows={3}/>
       </section>
 
-      <section className="card">
-        <h3 className="card-title">KI-Chat</h3>
-        {HAS_AI
-          ? <p className="muted small">✨ Läuft als Claude-Artefakt – die KI ist ohne API-Key aktiv. Ein Key ist nur nötig, wenn du die Datei standalone im Browser öffnest.</p>
-          : <p className="muted small">Standalone-Modus: Für den KI-Chat einen Anthropic-API-Key eintragen (nur lokal gespeichert). Oder die Datei als Claude-Artefakt öffnen – dann ohne Key.</p>}
-        <div className="field"><label>API-Key (optional)</label>
-          <div style={{display:'flex',gap:8}}>
-            <input type={showKey?'text':'password'} placeholder="sk-ant-…" value={settings.apiKey} onChange={e=>setS({apiKey:e.target.value.trim()})} autoComplete="off"/>
-            <button className="chip" onClick={()=>setShowKey(s=>!s)}>{showKey?'🙈':'👁️'}</button></div></div>
-        <div className="field"><label>Modell</label>
-          <select value={settings.model} onChange={e=>setS({model:e.target.value})}>{MODELS.map(m=>(<option key={m.id} value={m.id}>{m.label}</option>))}</select></div>
-      </section>
-      <p className="footer-note">{HAS_AI?'Hinweis: In der Artefakt-Vorschau werden Daten evtl. nicht dauerhaft gespeichert.':'Daten bleiben lokal in diesem Browser.'}</p>
+      <p className="footer-note">Daten bleiben lokal in diesem Browser (offline-fähig). Erfassung per „📋 Import“ (Copy &amp; Paste) oder „+ manuell“.</p>
     </div>
   );
 }
 
 /* ---------- App ---------- */
-const TABS=[{id:'today',label:'Heute',icon:'🍽️'},{id:'stats',label:'Analyse',icon:'📊'},{id:'archive',label:'Archiv',icon:'🗄️'},{id:'chat',label:'KI-Chat',icon:'💬'},{id:'profile',label:'Profil',icon:'⚙️'}];
+const TABS=[{id:'today',label:'Heute',icon:'🍽️'},{id:'stats',label:'Analyse',icon:'📊'},{id:'archive',label:'Archiv',icon:'🗄️'},{id:'profile',label:'Profil',icon:'⚙️'}];
 function App(){
   const [state,setState]=useState(load);
   const [tab,setTab]=useState('today');
   const [date,setDate]=useState(todayKey());
-  const [pending,setPending]=useState(null);
   const [importOpen,setImportOpen]=useState(false);
   useEffect(()=>{save(state);},[state]);
 
-  function suggest(remaining,target,eaten){
-    setPending(`Mir fehlen heute noch ${Math.max(remaining,0)} kcal bis zum Tagesbudget (Eiweiß ${Math.max(target.protein-eaten.protein,0)} g, Kohlenhydrate ${Math.max(target.carbs-eaten.carbs,0)} g, Fett ${Math.max(target.fat-eaten.fat,0)} g übrig). Mach mir 3 konkrete, alltagstaugliche Vorschläge dafür. Trage noch nichts ein.`);
-    setTab('chat');
-  }
   return (
     <div className="app">
       <main className="content">
-        {tab==='today' && <Today state={state} setState={setState} date={date} setDate={setDate} goToChat={()=>setTab('chat')} openImport={()=>setImportOpen(true)} suggest={suggest}/>}
+        {tab==='today' && <Today state={state} setState={setState} date={date} setDate={setDate} openImport={()=>setImportOpen(true)}/>}
         {tab==='stats' && <Stats state={state}/>}
         {tab==='archive' && <Archive state={state} setState={setState} setDate={setDate} goToToday={()=>setTab('today')} openImport={()=>setImportOpen(true)}/>}
-        {tab==='chat' && <Chat state={state} setState={setState} date={date} goToProfile={()=>setTab('profile')} pending={pending} clearPending={()=>setPending(null)}/>}
         {tab==='profile' && <Profile state={state} setState={setState}/>}
       </main>
       <nav className="tabbar">{TABS.map(t=>(
