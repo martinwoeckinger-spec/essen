@@ -1,73 +1,84 @@
-# Essen 🍏 – Kalorientracker PWA
+# Essen 🍊 – Kalorien- & Makrotracker
 
-Ein mobiler Kalorien- und Makrotracker als **Progressive Web App**. Läuft komplett
-im Browser, funktioniert offline und lässt sich auf dem Handy zum Startbildschirm
-hinzufügen wie eine native App. Alle Daten bleiben lokal auf dem Gerät.
+Ein **Kalorien- und Makrotracker in einer einzigen HTML-Datei** – ohne
+Build-Schritt, ohne Server, ohne KI/API und ohne Konto. Einfach
+[`artifact.html`](artifact.html) im Browser öffnen. Alle Daten bleiben lokal auf
+dem Gerät (`localStorage`).
 
-## Funktionen
-
-- **Tageserfassung** – Mahlzeiten & Sport pro Tag, mit Tagesnavigation
-- **KI-Chat** – natürlichsprachlich eintragen: _„2 Scheiben Vollkornbrot mit Käse"_
-  → Claude schätzt Kalorien + Makros und trägt sie ein (Tool-Use)
-- **Makro-Auswertung** – Eiweiß / Kohlenhydrate / Fett mit Zielbalken
-- **Grundumsatz** (Mifflin-St Jeor) und **Erhaltungsbedarf** aus deinem Profil
-- **Sportumsatz** – verbrannte Kalorien erfassen, optional zum Budget addieren
-- **Vorschläge** – die KI schlägt Mahlzeiten für die fehlenden Tageskalorien vor
-- **Verlauf** – 7/14/30-Tage-Diagramm und Durchschnittswerte
+Desktop-optimiert (Seitenleisten-Navigation, breites Layout, zweispaltige
+Tagesansicht), voll responsiv fürs Handy. Farbschema **Schwarz/Orange**.
 
 ## Schnellstart
 
-```bash
-npm install
-npm run generate-icons   # erzeugt die PWA-Icons (einmalig)
-npm run dev              # Entwicklung: http://localhost:5173
+- **Desktop/Handy:** `artifact.html` herunterladen und im Browser öffnen
+  (Doppelklick). Fertig – kein Setup.
+- Beim ersten Laden werden React/Babel einmalig über ein CDN geholt; danach
+  läuft alles lokal.
+
+> Zum Startbildschirm/Dock hinzufügen funktioniert wie bei jeder Webseite über
+> das Browser-Menü.
+
+## Funktionen
+
+- **Erfassung per Copy & Paste** – Tabelle (Tab- oder `|`-getrennt) einfügen;
+  **Datum und Mahlzeit werden automatisch zugeordnet**. Mit Vorschau,
+  Duplikat-Warnung, „rückgängig" und optionalem Leeren der betroffenen Tage.
+  Dazu **Schnell-Einfügen** direkt auf „Heute" und **manuelle** Eingabe
+  (inkl. „Werte pro 100 g"-Umrechnung).
+- **Mahlzeiten** – Frühstück / Mittag / Abend / Snack mit Zwischensummen;
+  Einträge bearbeiten (✎), löschen (×) oder als **Favorit** (⭐) speichern.
+- **Favoriten** – häufige Lebensmittel mit einem Klick wieder hinzufügen.
+- **„Gestern übernehmen"** – den Vortag in einen Tag kopieren.
+- **Erweiterte Nährwerte** – kcal, Eiweiß/KH/Fett **plus** Zucker, gesättigte
+  Fettsäuren, Ballaststoffe und Salz, mit Ziel-/Limit-Balken und Makro-Donut.
+- **Gewicht** – pro Tag erfassen; Verlaufskurve und Bezug zum Wunschgewicht.
+- **Archiv** – alle Tage nach Monat, durchsuchbar; Export zurück ins Tab-Format.
+- **Analyse** – umschaltbarer **Zeitverlauf** (Kalorien/Makros/Ballaststoffe/
+  Zucker/Salz) mit 7-Tage-Schnitt, **Kalender-Heatmap**, **Gewichtsverlauf**,
+  **Kalorienbilanz** (geschätzte kg-Veränderung), Verteilung nach Mahlzeit und
+  Tracking-Treue (Budget-Treue, Serie).
+- **Profil & Wünsche** – Körperdaten, Wunschgewicht inkl. Tempo-/Dauerschätzung,
+  Ernährungsstil, Makro-Verteilung, Nährwert-Ziele/-Limits und persönliche
+  Hinweise.
+- **Backup** – komplette Daten als JSON sichern und wiederherstellen.
+- **Drucken** – aktuellen Tag als sauberen (hellen) Ausdruck/PDF.
+
+### Import-Format
+
+Eine Zeile pro Lebensmittel, Spalten per **Tab** (oder `|`) getrennt:
+
+```
+Datum  Mahlzeit  Nahrungsmittel  Menge  kcal  Eiweiß  KH  Zucker  Fett  ges.FS  Ballaststoffe  Salz  Notiz
 ```
 
-### Build & Deploy (statisch)
+Beispiel (deutsche Kommazahlen und Notizen mit Kommas sind erlaubt):
 
-```bash
-npm run build            # Ergebnis liegt in dist/
-npm run preview          # gebauten Stand lokal testen
+```
+02.06.2026	Frühstück	Naturjoghurt	400 g	260	14	19	19	14	9	0	0,4	Vollmilchjoghurt 3,5%
+02.06.2026	Mittagessen	Chicken-Panade-Salat	1 Portion	550	35	30	5	30	6	5	1,5	Restaurantportion
 ```
 
-Der Inhalt von `dist/` ist eine rein statische Seite und kann auf jeden
-beliebigen Webspace, Netlify, Vercel, GitHub Pages o.ä. geladen werden.
-`base: './'` in `vite.config.ts` sorgt dafür, dass die App auch in einem
-Unterordner funktioniert.
+Aufrufbar über **„📋 Import"** (mit Vorschau) oder **„⚡ Einfügen"** (direkt)
+auf der Heute-Seite.
 
-## Variante ohne API-Key: `artifact.html`
+## Tastenkürzel (Desktop)
 
-Neben der vollen PWA gibt es **`artifact.html`** – die komplette App in einer
-einzigen Datei, ganz ohne Build-Schritt:
+| Taste | Aktion |
+|------|--------|
+| `←` / `→` | Tag wechseln (auf „Heute") |
+| `t` | Zum heutigen Tag springen |
+| `i` | Import öffnen |
+| `Esc` | Dialog schließen |
 
-- **Als Claude-Artefakt** (Inhalt der Datei in einen Claude-Chat geben): Der
-  KI-Chat läuft dann über die eingebaute Claude-Laufzeit (`window.claude.complete`)
-  – **kein API-Key nötig**.
-- **Standalone**: Datei einfach im Browser öffnen. Tracking, Makros, Grund-/
-  Sportumsatz und Auswertung funktionieren komplett ohne Key. Für den KI-Chat
-  kann optional ein Anthropic-Key im Profil hinterlegt werden.
+## Datensicherung
 
-> Hinweis: In der Artefakt-Sandbox werden Daten ggf. nicht dauerhaft gespeichert
-> (kein persistenter `localStorage`). Standalone/als PWA bleiben die Daten lokal
-> erhalten.
+Alle Daten liegen ausschließlich im `localStorage` deines Browsers. Lade unter
+**Profil → 💾 Daten & Sicherung** regelmäßig ein **JSON-Backup** herunter, damit
+beim Leeren des Browser-Speichers nichts verloren geht. Über denselben Bereich
+lässt sich ein Backup wieder einspielen.
 
-## KI-Chat einrichten (PWA-Variante)
+## Technik & Datenschutz
 
-1. Anthropic-API-Key unter <https://console.anthropic.com> erstellen.
-2. In der App auf **Profil → KI-Chat** den Key eintragen und ein Modell wählen.
-
-Der Key wird **nur lokal** im Browser (LocalStorage) gespeichert und direkt von
-deinem Gerät an die Anthropic-API gesendet – es gibt keinen eigenen Server.
-
-> Hinweis: Direkte Browser-Aufrufe der API sind über die SDK-Option
-> `dangerouslyAllowBrowser` aktiviert. Das ist für eine private App auf dem
-> eigenen Gerät vorgesehen; teile deinen Key nicht öffentlich.
-
-## Aufs Handy installieren
-
-Seite im mobilen Browser öffnen → Teilen/Menü → **Zum Startbildschirm hinzufügen**.
-
-## Technik
-
-Vite · React · TypeScript · zustand (lokale Persistenz) · vite-plugin-pwa ·
-`@anthropic-ai/sdk`. Berechnungen siehe `src/lib/calc.ts`.
+- Eine Datei, reines Frontend: React 18 + Babel-Standalone (per CDN), kein Build.
+- Keine Server-Kommunikation, **keine KI/API**, kein Tracking.
+- Persistenz lokal über `localStorage`; Export/Backup als TSV bzw. JSON.
