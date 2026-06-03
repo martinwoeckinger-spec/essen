@@ -2,7 +2,7 @@
 
 Ein **Kalorien- und Makrotracker in einer einzigen HTML-Datei** – ohne
 Build-Schritt, ohne Server, ohne KI/API und ohne Konto. Einfach
-[`artifact.html`](artifact.html) im Browser öffnen. Alle Daten bleiben lokal auf
+[`index.html`](index.html) im Browser öffnen. Alle Daten bleiben lokal auf
 dem Gerät (`localStorage`).
 
 Desktop-optimiert (Seitenleisten-Navigation, breites Layout, zweispaltige
@@ -10,7 +10,7 @@ Tagesansicht), voll responsiv fürs Handy. Farbschema **Schwarz/Orange**.
 
 ## Schnellstart
 
-- **Desktop/Handy:** `artifact.html` herunterladen und im Browser öffnen
+- **Desktop/Handy:** `index.html` herunterladen und im Browser öffnen
   (Doppelklick). Fertig – kein Setup.
 - Beim ersten Laden werden React/Babel einmalig über ein CDN geholt; danach
   läuft alles lokal.
