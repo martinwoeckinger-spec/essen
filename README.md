@@ -18,6 +18,28 @@ Tagesansicht), voll responsiv fürs Handy. Farbschema **Schwarz/Orange**.
 > Zum Startbildschirm/Dock hinzufügen funktioniert wie bei jeder Webseite über
 > das Browser-Menü.
 
+## Online stellen (GitHub Pages)
+
+Da die App reines statisches Frontend ist (keine KI/kein Server), läuft sie
+direkt auf GitHub Pages.
+
+**Automatisch (empfohlen):** Im Repo liegt ein Workflow
+([`.github/workflows/pages.yml`](.github/workflows/pages.yml)), der bei jedem
+Push die `index.html` veröffentlicht. Einmalig nötig:
+
+1. **Settings → Pages → Build and deployment → Source: „GitHub Actions"**.
+2. Danach läuft der Workflow bei jedem Push automatisch; die Live-URL erscheint
+   unter **Actions → Deploy to GitHub Pages** bzw. **Settings → Pages**
+   (Form: `https://<user>.github.io/essen/`).
+
+> Hinweis: Deployt wird vom Branch `claude/zen-lovelace-MAcnT`. Falls die
+> Umgebung „github-pages" nur den Standard-Branch zulässt, diesen Branch unter
+> **Settings → Environments → github-pages** erlauben (oder den Branch mergen).
+
+**Ohne Workflow (klassisch):** Alternativ **Settings → Pages → Source: „Deploy
+from a branch"**, Branch wählen, Ordner `/ (root)`. GitHub liefert dann die
+`index.html` direkt aus – funktioniert von jedem Branch.
+
 ## Funktionen
 
 - **Erfassung per Copy & Paste** – Tabelle (Tab- oder `|`-getrennt) einfügen;
