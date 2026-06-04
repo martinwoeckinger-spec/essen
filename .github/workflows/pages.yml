@@ -4,6 +4,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: ["claude/zen-lovelace-MAcnT"]
+    paths: ["index.html", ".github/workflows/pages.yml"]
   workflow_dispatch:
 
 permissions:
