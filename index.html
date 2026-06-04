@@ -87,6 +87,8 @@
   textarea{background:var(--bg);border:1px solid var(--track);color:var(--text);border-radius:10px;padding:11px 12px;width:100%;outline:none;resize:vertical;font-size:15px}
   textarea:focus{border-color:var(--accent2)}
   .primary{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:12px;font-weight:700;cursor:pointer}
+  .erfassen-btn{width:100%;padding:15px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:800;font-size:16px;cursor:pointer;display:block;box-shadow:0 4px 14px rgba(249,115,22,.35)}
+  .erfassen-btn:hover{filter:brightness(1.06)}
   .chat-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}.chat-head h2{margin:0;font-size:22px}
   .seg{display:flex;gap:4px;background:var(--card2);padding:3px;border-radius:10px}
   .seg button{background:none;border:none;color:var(--muted);padding:6px 10px;border-radius:8px;font-weight:600;cursor:pointer}
@@ -190,8 +192,8 @@
     .tab-icon{font-size:20px}.tab-label{font-size:14px;font-weight:600}
     .tab.active{background:var(--card);color:var(--accent2)}
     .page{max-width:880px;margin:0 auto;padding:28px 28px 44px}
-    .page-today{max-width:1060px}
-    .page-today .cols{display:grid;grid-template-columns:340px 1fr;gap:18px;align-items:start}
+    .page-dash{max-width:1060px}
+    .page-dash .cols{display:grid;grid-template-columns:340px 1fr;gap:18px;align-items:start}
     .datebar-label{font-size:22px}
     .toast{bottom:24px}
     .overlay{align-items:flex-start;justify-content:center;background:rgba(0,0,0,.65);max-width:none;margin:0;padding:48px 16px}
@@ -199,8 +201,8 @@
     .overlay-head{padding:16px 18px}.overlay-body{padding:16px 18px 24px}
   }
   @media (min-width:1280px){
-    .app{max-width:1320px}.page-today{max-width:1160px}
-    .page-today .cols{grid-template-columns:360px 1fr}
+    .app{max-width:1320px}.page-dash{max-width:1160px}
+    .page-dash .cols{grid-template-columns:360px 1fr}
   }
   @media print{
     :root{--bg:#fff;--bg2:#fff;--card:#fff;--card2:#f1f1f1;--text:#111;--muted:#555;--track:#ddd}
@@ -209,7 +211,7 @@
     .app{display:block;max-width:none;height:auto}
     .content{overflow:visible;height:auto}
     .page{max-width:none;padding:0}
-    .page-today .cols{display:block}
+    .page-dash .cols{display:block}
     .card{border:1px solid #ddd;break-inside:avoid;margin-bottom:10px}
   }
 </style>
@@ -679,22 +681,18 @@ function FavPanel({state,setState,date,notify,onClose}){
   );
 }
 
-function Today({state,setState,date,setDate,openImport,notify}){
+function Dashboard({state,setState,date,setDate}){
   const {profile,goal}=state;
   const day=state.days[date]||{date,foods:[],exercises:[]};
   const totals=sumNut(day.foods), consumed=totals.calories;
   const burned=Math.round(day.exercises.reduce((a,e)=>a+(+e.calories||0),0));
   const budget=dailyBudget(profile,goal,burned), target=targetMacros(budget,goal);
-  const [openF,setOpenF]=useState(false),[openE,setOpenE]=useState(false),[openFav,setOpenFav]=useState(false),[openPaste,setOpenPaste]=useState(false),[editId,setEditId]=useState(null),[pick,setPick]=useState(false);
+  const [pick,setPick]=useState(false);
   const [wInput,setWInput]=useState(n2s(state.weights[date]));
   useEffect(()=>{setWInput(n2s(state.weights[date]));},[date,state.weights]);
-  const rmFood=id=>setState(s=>{const d=s.days[date];if(!d)return s;return{...s,days:{...s.days,[date]:{...d,foods:d.foods.filter(x=>x.id!==id)}}};});
-  const rmEx=id=>setState(s=>{const d=s.days[date];if(!d)return s;return{...s,days:{...s.days,[date]:{...d,exercises:d.exercises.filter(x=>x.id!==id)}}};});
-  const prev=addDays(date,-1); const prevHas=(state.days[prev]&&state.days[prev].foods.length)>0;
   const macroSegs=[{value:totals.protein*4,color:'var(--protein)'},{value:totals.carbs*4,color:'var(--carbs)'},{value:totals.fat*9,color:'var(--fat)'}];
-
   return (
-    <div className="page page-today">
+    <div className="page page-dash">
       <header className="datebar">
         <button className="nav-btn" onClick={()=>setDate(addDays(date,-1))}>‹</button>
         {pick
@@ -702,10 +700,6 @@ function Today({state,setState,date,setDate,openImport,notify}){
           : <button className="datebar-label" onClick={()=>setPick(true)} title="Datum wählen">{dateLabel(date)} ▾</button>}
         <button className="nav-btn" onClick={()=>setDate(addDays(date,1))} disabled={date>=todayKey()}>›</button>
       </header>
-      <div className="toolbar">
-        {prevHas && <button className="chip" onClick={()=>{copyDay(setState,prev,date);notify('Mahlzeiten von gestern übernommen');}}>⊕ Gestern übernehmen</button>}
-        <button className="chip" onClick={()=>window.print()}>🖨️ Drucken</button>
-      </div>
       <div className="cols">
       <div className="col">
       <section className="card hero">
@@ -727,6 +721,8 @@ function Today({state,setState,date,setDate,openImport,notify}){
           </div>
         </div>
       </section>
+      </div>
+      <div className="col">
       <section className="card">
         <h3 className="card-title">Weitere Nährwerte</h3>
         <MacroBar label="Ballaststoffe" value={totals.fiber} target={goal.fiberGoal} color="var(--fiber)"/>
@@ -751,19 +747,45 @@ function Today({state,setState,date,setDate,openImport,notify}){
         </div>
       </section>
       </div>
-      <div className="col">
+      </div>
+    </div>
+  );
+}
+
+function Today({state,setState,date,setDate,openImport,notify}){
+  const day=state.days[date]||{date,foods:[],exercises:[]};
+  const [openF,setOpenF]=useState(false),[openE,setOpenE]=useState(false),[openFav,setOpenFav]=useState(false),[openPaste,setOpenPaste]=useState(false),[editId,setEditId]=useState(null),[pick,setPick]=useState(false);
+  const rmFood=id=>setState(s=>{const d=s.days[date];if(!d)return s;return{...s,days:{...s.days,[date]:{...d,foods:d.foods.filter(x=>x.id!==id)}}};});
+  const rmEx=id=>setState(s=>{const d=s.days[date];if(!d)return s;return{...s,days:{...s.days,[date]:{...d,exercises:d.exercises.filter(x=>x.id!==id)}}};});
+  const prev=addDays(date,-1); const prevHas=(state.days[prev]&&state.days[prev].foods.length)>0;
+  function toggleErfassen(){setOpenPaste(false);setOpenFav(false);setEditId(null);setOpenF(o=>!o);}
+  return (
+    <div className="page">
+      <header className="datebar">
+        <button className="nav-btn" onClick={()=>setDate(addDays(date,-1))}>‹</button>
+        {pick
+          ? <input type="date" className="date-input" autoFocus value={date} max={todayKey()} onChange={e=>{if(e.target.value)setDate(e.target.value);}} onBlur={()=>setPick(false)}/>
+          : <button className="datebar-label" onClick={()=>setPick(true)} title="Datum wählen">{dateLabel(date)} ▾</button>}
+        <button className="nav-btn" onClick={()=>setDate(addDays(date,1))} disabled={date>=todayKey()}>›</button>
+      </header>
+      <div className="toolbar">
+        {prevHas && <button className="chip" onClick={()=>{copyDay(setState,prev,date);notify('Mahlzeiten von gestern übernommen');}}>⊕ Gestern übernehmen</button>}
+        <button className="chip" onClick={()=>window.print()}>🖨️ Drucken</button>
+      </div>
+
+      <button className="erfassen-btn" onClick={toggleErfassen}>{openF?'✕ Abbrechen':'＋ Mahlzeit erfassen'}</button>
+      {openF && <section className="card"><FoodForm onSubmit={f=>{addFoodTo(setState,date,f);setOpenF(false);notify('Eingetragen: '+f.name);}}/></section>}
+
       <section className="card">
         <div className="section-head"><h3 className="card-title">Mahlzeiten</h3>
           <div className="section-actions">
             <button className="chip" onClick={openImport}>📋 Import</button>
-            <button className="chip" onClick={()=>setOpenPaste(o=>!o)}>{openPaste?'✕':'⚡ Einfügen'}</button>
-            <button className="chip" onClick={()=>setOpenFav(o=>!o)}>{openFav?'✕':'⭐ Favoriten'}</button>
-            <button className="chip" onClick={()=>{setEditId(null);setOpenF(o=>!o);}}>{openF?'✕':'+ manuell'}</button>
+            <button className="chip" onClick={()=>{setOpenF(false);setOpenFav(false);setOpenPaste(o=>!o);}}>{openPaste?'✕':'⚡ Einfügen'}</button>
+            <button className="chip" onClick={()=>{setOpenF(false);setOpenPaste(false);setOpenFav(o=>!o);}}>{openFav?'✕':'⭐ Favoriten'}</button>
           </div></div>
         {openPaste && <QuickPaste setState={setState} setDate={setDate} notify={notify} onClose={()=>setOpenPaste(false)}/>}
         {openFav && <FavPanel state={state} setState={setState} date={date} notify={notify} onClose={()=>setOpenFav(false)}/>}
-        {openF && <FoodForm onSubmit={f=>{addFoodTo(setState,date,f);setOpenF(false);}}/>}
-        {day.foods.length===0 && !openF && !openPaste && !openFav && <p className="empty">Noch nichts erfasst. Tippe auf „📋 Import", „⚡ Einfügen" oder „+ manuell".</p>}
+        {day.foods.length===0 && !openPaste && !openFav && <p className="empty">Noch nichts erfasst. Tippe oben auf „＋ Mahlzeit erfassen" – oder „📋 Import" / „⚡ Einfügen".</p>}
         {MEAL_ORDER.map(meal=>{
           const items=day.foods.filter(f=>f.meal===meal); if(!items.length)return null;
           return (<div className="meal-group" key={meal}>
@@ -789,7 +811,7 @@ function Today({state,setState,date,setDate,openImport,notify}){
 
       <section className="card">
         <div className="section-head"><h3 className="card-title">Sport</h3>
-          <div className="section-actions"><button className="chip" onClick={()=>setOpenE(o=>!o)}>{openE?'✕':'+ manuell'}</button></div></div>
+          <div className="section-actions"><button className="chip" onClick={()=>setOpenE(o=>!o)}>{openE?'✕':'+ erfassen'}</button></div></div>
         {openE && <ExerciseForm onSubmit={e=>{addExTo(setState,date,e);setOpenE(false);}}/>}
         {day.exercises.length===0 && !openE && <p className="empty">Noch kein Sport erfasst.</p>}
         <ul className="entries">{day.exercises.map(e=>(
@@ -800,8 +822,6 @@ function Today({state,setState,date,setDate,openImport,notify}){
             <button className="del" onClick={()=>rmEx(e.id)}>×</button>
           </li>))}</ul>
       </section>
-      </div>
-      </div>
     </div>
   );
 }
@@ -1111,10 +1131,10 @@ function Profile({state,setState,notify}){
 }
 
 /* ---------- App ---------- */
-const TABS=[{id:'today',label:'Heute',icon:'🍽️'},{id:'stats',label:'Analyse',icon:'📊'},{id:'archive',label:'Archiv',icon:'🗄️'},{id:'profile',label:'Profil',icon:'⚙️'}];
+const TABS=[{id:'dashboard',label:'Dashboard',icon:'🏠'},{id:'today',label:'Heute',icon:'🍽️'},{id:'stats',label:'Analyse',icon:'📊'},{id:'archive',label:'Archiv',icon:'🗄️'},{id:'profile',label:'Profil',icon:'⚙️'}];
 function App(){
   const [state,setState]=useState(load);
-  const [tab,setTab]=useState('today');
+  const [tab,setTab]=useState('dashboard');
   const [date,setDate]=useState(todayKey());
   const [importOpen,setImportOpen]=useState(false);
   const [toast,setToast]=useState(null);
@@ -1129,8 +1149,9 @@ function App(){
       const t=e.target;
       if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.tagName==='SELECT'||t.isContentEditable))return;
       if(impRef.current){ if(e.key==='Escape')setImportOpen(false); return; }
-      if(e.key==='ArrowLeft'&&tabRef.current==='today'){setDate(addDays(dateRef.current,-1));}
-      else if(e.key==='ArrowRight'&&tabRef.current==='today'){if(dateRef.current<todayKey())setDate(addDays(dateRef.current,1));}
+      const onDay=tabRef.current==='today'||tabRef.current==='dashboard';
+      if(e.key==='ArrowLeft'&&onDay){setDate(addDays(dateRef.current,-1));}
+      else if(e.key==='ArrowRight'&&onDay){if(dateRef.current<todayKey())setDate(addDays(dateRef.current,1));}
       else if(e.key==='t'||e.key==='T'){setDate(todayKey());setTab('today');}
       else if(e.key==='i'||e.key==='I'){setImportOpen(true);}
     };
@@ -1141,6 +1162,7 @@ function App(){
   return (
     <div className="app">
       <main className="content">
+        {tab==='dashboard' && <Dashboard state={state} setState={setState} date={date} setDate={setDate}/>}
         {tab==='today' && <Today state={state} setState={setState} date={date} setDate={setDate} openImport={()=>setImportOpen(true)} notify={notify}/>}
         {tab==='stats' && <Stats state={state} setDate={setDate} goToToday={()=>setTab('today')}/>}
         {tab==='archive' && <Archive state={state} setState={setState} setDate={setDate} goToToday={()=>setTab('today')} openImport={()=>setImportOpen(true)}/>}
