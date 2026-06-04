@@ -18,36 +18,19 @@ Tagesansicht), voll responsiv fürs Handy. Farbschema **Schwarz/Orange**.
 > Zum Startbildschirm/Dock hinzufügen funktioniert wie bei jeder Webseite über
 > das Browser-Menü.
 
-## Online stellen (GitHub Pages)
+## Online (GitHub Pages)
 
-Da die App reines statisches Frontend ist (keine KI/kein Server), läuft sie
-direkt auf GitHub Pages.
+Die App ist als statische Seite live:
 
-> **Wichtig (einmalig):** GitHub Pages muss **einmal von Hand** aktiviert werden
-> – der Workflow kann das aus Rechtegründen nicht selbst. Außerdem ist Pages für
-> **private** Repos nur in bezahlten Plänen verfügbar. Empfehlung: Da die App
-> keine Geheimnisse enthält, das Repo **öffentlich** machen – dann ist Pages
-> gratis.
+**https://martinwoeckinger-spec.github.io/essen/**
 
-**Einrichtung:**
+Veröffentlicht wird über **Settings → Pages → „Deploy from a branch"**
+(Standard-Branch, Ordner `/ (root)`). Da `index.html` im Repo-Root liegt,
+veröffentlicht GitHub jede Änderung **automatisch** neu – kein Build, kein
+Workflow nötig.
 
-1. **Settings → Pages → Build and deployment → Source: „GitHub Actions"**.
-2. **Actions → „Deploy to GitHub Pages" → Run workflow** (oder einfach den
-   nächsten Push abwarten). Die Live-URL erscheint danach unter **Settings →
-   Pages** (Form: `https://<user>.github.io/essen/`).
-
-Der Workflow ([`.github/workflows/pages.yml`](.github/workflows/pages.yml))
-veröffentlicht `index.html` anschließend bei jedem Push automatisch.
-
-> Hinweis: Deployt wird vom Branch `claude/zen-lovelace-MAcnT`. Lässt die
-> Umgebung „github-pages" nur den Standard-Branch zu, diesen Branch unter
-> **Settings → Environments → github-pages** erlauben (oder den Branch zum
-> Standard-Branch machen).
-
-**Alternative ohne Actions:** **Settings → Pages → Source: „Deploy from a
-branch"**, Branch wählen, Ordner `/ (root)`. GitHub liefert die `index.html`
-dann direkt aus – funktioniert von jedem Branch (Pages-Aktivierung/Plan gelten
-genauso).
+> Selbst hosten: `index.html` auf beliebigen Webspace legen – oder einfach lokal
+> per Doppelklick öffnen.
 
 ## Funktionen
 
