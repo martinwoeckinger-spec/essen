@@ -2,7 +2,7 @@
 
 Ein **Kalorien- und Makrotracker in einer einzigen HTML-Datei** – ohne
 Build-Schritt, ohne Server, ohne KI/API und ohne Konto. Einfach
-[`artifact.html`](artifact.html) im Browser öffnen. Alle Daten bleiben lokal auf
+[`index.html`](index.html) im Browser öffnen. Alle Daten bleiben lokal auf
 dem Gerät (`localStorage`).
 
 Desktop-optimiert (Seitenleisten-Navigation, breites Layout, zweispaltige
@@ -10,13 +10,44 @@ Tagesansicht), voll responsiv fürs Handy. Farbschema **Schwarz/Orange**.
 
 ## Schnellstart
 
-- **Desktop/Handy:** `artifact.html` herunterladen und im Browser öffnen
+- **Desktop/Handy:** `index.html` herunterladen und im Browser öffnen
   (Doppelklick). Fertig – kein Setup.
 - Beim ersten Laden werden React/Babel einmalig über ein CDN geholt; danach
   läuft alles lokal.
 
 > Zum Startbildschirm/Dock hinzufügen funktioniert wie bei jeder Webseite über
 > das Browser-Menü.
+
+## Online stellen (GitHub Pages)
+
+Da die App reines statisches Frontend ist (keine KI/kein Server), läuft sie
+direkt auf GitHub Pages.
+
+> **Wichtig (einmalig):** GitHub Pages muss **einmal von Hand** aktiviert werden
+> – der Workflow kann das aus Rechtegründen nicht selbst. Außerdem ist Pages für
+> **private** Repos nur in bezahlten Plänen verfügbar. Empfehlung: Da die App
+> keine Geheimnisse enthält, das Repo **öffentlich** machen – dann ist Pages
+> gratis.
+
+**Einrichtung:**
+
+1. **Settings → Pages → Build and deployment → Source: „GitHub Actions"**.
+2. **Actions → „Deploy to GitHub Pages" → Run workflow** (oder einfach den
+   nächsten Push abwarten). Die Live-URL erscheint danach unter **Settings →
+   Pages** (Form: `https://<user>.github.io/essen/`).
+
+Der Workflow ([`.github/workflows/pages.yml`](.github/workflows/pages.yml))
+veröffentlicht `index.html` anschließend bei jedem Push automatisch.
+
+> Hinweis: Deployt wird vom Branch `claude/zen-lovelace-MAcnT`. Lässt die
+> Umgebung „github-pages" nur den Standard-Branch zu, diesen Branch unter
+> **Settings → Environments → github-pages** erlauben (oder den Branch zum
+> Standard-Branch machen).
+
+**Alternative ohne Actions:** **Settings → Pages → Source: „Deploy from a
+branch"**, Branch wählen, Ordner `/ (root)`. GitHub liefert die `index.html`
+dann direkt aus – funktioniert von jedem Branch (Pages-Aktivierung/Plan gelten
+genauso).
 
 ## Funktionen
 
