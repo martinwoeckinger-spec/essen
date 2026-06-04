@@ -3,7 +3,7 @@ name: Deploy to GitHub Pages
 # Veröffentlicht die statische Single-File-App (index.html) auf GitHub Pages.
 on:
   push:
-    branches: ["claude/zen-lovelace-MAcnT"]
+    branches: ["claude/zen-lovelace-MAcnT", "claude/calorie-tracker-pwa-Z6FNb"]
     paths: ["index.html", ".github/workflows/pages.yml"]
   workflow_dispatch:
 
