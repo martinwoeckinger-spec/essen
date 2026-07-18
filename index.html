@@ -507,6 +507,64 @@ const Overlay=({title,onClose,children})=>(
     </div>
   </div>);
 
+/* ---------- Tages-Übersicht für Claude ---------- */
+function buildDaySummary(state,date){
+  const {profile,goal}=state;
+  const day=state.days[date]||{date,foods:[],exercises:[]};
+  const t=sumNut(day.foods);
+  const burned=Math.round(day.exercises.reduce((a,e)=>a+(+e.calories||0),0));
+  const budget=dailyBudget(profile,goal,burned);
+  const tgt=targetMacros(budget,goal);
+  const rest=budget-t.calories;
+  const modeLabel=goal.adjustment<0?'Abnehmen':goal.adjustment>0?'Aufbauen':'Halten';
+  const L=[];
+  L.push('Ernährungs-Tagesübersicht – '+fullDate(date));
+  L.push('');
+  L.push('Ziel: '+modeLabel+' · Tagesbudget '+budget+' kcal (Erhaltung '+maintenance(profile)+(goal.adjustment?', Anpassung '+(goal.adjustment>0?'+':'')+goal.adjustment:'')+') · Stil: '+DIET_LABELS[goal.dietStyle]);
+  L.push('Profil: '+(profile.sex==='male'?'m':'w')+', '+profile.age+' J, '+profile.height+' cm, '+profile.weight+' kg'+(profile.targetWeight?' (Ziel '+profile.targetWeight+' kg)':''));
+  if((goal.preferences||'').trim()) L.push('Vorlieben/Hinweise: '+goal.preferences.trim());
+  L.push('');
+  L.push('Gegessen: '+t.calories+' / '+budget+' kcal (Rest '+rest+')'+(burned?' · Sport +'+burned+' kcal':''));
+  L.push('Makros: Eiweiß '+t.protein+'/'+tgt.protein+' g · KH '+t.carbs+'/'+tgt.carbs+' g · Fett '+t.fat+'/'+tgt.fat+' g');
+  L.push('Weiteres: Ballaststoffe '+t.fiber+'/'+goal.fiberGoal+' g · Zucker '+t.sugar+' (max '+goal.sugarLimit+') · ges. FS '+t.saturatedFat+' (max '+goal.satFatLimit+') · Salz '+t.salt+' (max '+goal.saltLimit+') g');
+  MEAL_ORDER.forEach(m=>{
+    const items=day.foods.filter(f=>f.meal===m); if(!items.length)return;
+    L.push('');
+    L.push(MEALS[m].icon+' '+MEALS[m].label+' ('+sumCal(items)+' kcal)');
+    items.forEach(f=>L.push('- '+f.name+(f.quantity?', '+f.quantity:'')+' — '+Math.round(f.calories)+' kcal (E'+f.protein+'/KH'+f.carbs+'/F'+f.fat+')'+(f.note?' · '+f.note:'')));
+  });
+  if(day.exercises.length){
+    L.push('');
+    L.push('Sport: '+day.exercises.map(e=>e.name+(e.durationMin?' '+e.durationMin+' min':'')+' (−'+Math.round(e.calories)+' kcal)').join(', '));
+  }
+  if(state.weights[date]!=null) L.push('Gewicht: '+state.weights[date]+' kg');
+  if(!day.foods.length) L.push('\n(An diesem Tag wurde noch nichts erfasst.)');
+  L.push('');
+  L.push('---');
+  L.push('Das ist meine Ernährung an diesem Tag. Bitte gib mir kurzes, konkretes Feedback (Makro-Balance, Kalorienziel, was ich verbessern könnte).');
+  return L.join('\n');
+}
+function DayShareOverlay({state,date,onClose}){
+  const text=useMemo(()=>buildDaySummary(state,date),[state,date]);
+  const [copied,setCopied]=useState(false);
+  const ref=useRef(null);
+  async function copy(){
+    try{await navigator.clipboard.writeText(text);setCopied(true);setTimeout(()=>setCopied(false),1500);}
+    catch(e){ if(ref.current){ref.current.focus();ref.current.select();} }
+  }
+  return (
+    <Overlay title="Tages-Übersicht für Claude" onClose={onClose}>
+      <div className="card">
+        <p className="muted small" style={{marginTop:0}}>Kompakte Zusammenfassung dieses Tages – kopieren und in einen Claude-Chat einfügen, um Feedback oder Vorschläge zu bekommen.</p>
+        <div className="import-actions">
+          <button className="chip" onClick={copy}>{copied?'✓ Kopiert':'📋 Kopieren'}</button>
+        </div>
+        <textarea ref={ref} className="import-text" value={text} readOnly rows={15} spellCheck={false} onFocus={e=>e.target.select()}/>
+      </div>
+    </Overlay>
+  );
+}
+
 /* ---------- Import-Overlay ---------- */
 function ImportPanel({state,setState,setDate,onClose}){
   const [text,setText]=useState('');
@@ -687,7 +745,7 @@ function Dashboard({state,setState,date,setDate}){
   const totals=sumNut(day.foods), consumed=totals.calories;
   const burned=Math.round(day.exercises.reduce((a,e)=>a+(+e.calories||0),0));
   const budget=dailyBudget(profile,goal,burned), target=targetMacros(budget,goal);
-  const [pick,setPick]=useState(false);
+  const [pick,setPick]=useState(false),[share,setShare]=useState(false);
   const [wInput,setWInput]=useState(n2s(state.weights[date]));
   useEffect(()=>{setWInput(n2s(state.weights[date]));},[date,state.weights]);
   const macroSegs=[{value:totals.protein*4,color:'var(--protein)'},{value:totals.carbs*4,color:'var(--carbs)'},{value:totals.fat*9,color:'var(--fat)'}];
@@ -700,6 +758,9 @@ function Dashboard({state,setState,date,setDate}){
           : <button className="datebar-label" onClick={()=>setPick(true)} title="Datum wählen">{dateLabel(date)} ▾</button>}
         <button className="nav-btn" onClick={()=>setDate(addDays(date,1))} disabled={date>=todayKey()}>›</button>
       </header>
+      <div className="toolbar">
+        <button className="chip" onClick={()=>setShare(true)}>🤖 Für Claude kopieren</button>
+      </div>
       <div className="cols">
       <div className="col">
       <section className="card hero">
@@ -748,13 +809,14 @@ function Dashboard({state,setState,date,setDate}){
       </section>
       </div>
       </div>
+      {share && <DayShareOverlay state={state} date={date} onClose={()=>setShare(false)}/>}
     </div>
   );
 }
 
 function Today({state,setState,date,setDate,openImport,notify}){
   const day=state.days[date]||{date,foods:[],exercises:[]};
-  const [openF,setOpenF]=useState(false),[openE,setOpenE]=useState(false),[openFav,setOpenFav]=useState(false),[openPaste,setOpenPaste]=useState(false),[editId,setEditId]=useState(null),[pick,setPick]=useState(false);
+  const [openF,setOpenF]=useState(false),[openE,setOpenE]=useState(false),[openFav,setOpenFav]=useState(false),[openPaste,setOpenPaste]=useState(false),[editId,setEditId]=useState(null),[pick,setPick]=useState(false),[share,setShare]=useState(false);
   const rmFood=id=>setState(s=>{const d=s.days[date];if(!d)return s;return{...s,days:{...s.days,[date]:{...d,foods:d.foods.filter(x=>x.id!==id)}}};});
   const rmEx=id=>setState(s=>{const d=s.days[date];if(!d)return s;return{...s,days:{...s.days,[date]:{...d,exercises:d.exercises.filter(x=>x.id!==id)}}};});
   const prev=addDays(date,-1); const prevHas=(state.days[prev]&&state.days[prev].foods.length)>0;
@@ -770,6 +832,7 @@ function Today({state,setState,date,setDate,openImport,notify}){
       </header>
       <div className="toolbar">
         {prevHas && <button className="chip" onClick={()=>{copyDay(setState,prev,date);notify('Mahlzeiten von gestern übernommen');}}>⊕ Gestern übernehmen</button>}
+        <button className="chip" onClick={()=>setShare(true)}>🤖 Für Claude</button>
         <button className="chip" onClick={()=>window.print()}>🖨️ Drucken</button>
       </div>
 
@@ -822,6 +885,7 @@ function Today({state,setState,date,setDate,openImport,notify}){
             <button className="del" onClick={()=>rmEx(e.id)}>×</button>
           </li>))}</ul>
       </section>
+      {share && <DayShareOverlay state={state} date={date} onClose={()=>setShare(false)}/>}
     </div>
   );
 }
