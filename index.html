@@ -116,7 +116,8 @@ html,body,#root{height:100%;margin:0}
   .seg button{ @apply bg-transparent border-0 text-onvar rounded-full font-semibold cursor-pointer transition; padding:6px 12px; }
   .seg button.on{ @apply bg-primary text-onprimary; }
   .seg.full{ width:100%; } .seg.full button{ flex:1; }
-  .metric-chips{ @apply flex gap-1.5 overflow-x-auto; padding-bottom:10px;-webkit-overflow-scrolling:touch; }
+  .metric-chips{ @apply flex gap-1.5 overflow-x-auto; padding-bottom:2px;-webkit-overflow-scrolling:touch;scrollbar-width:none; }
+  .metric-chips::-webkit-scrollbar{ display:none; }
   .metric-chip{ @apply flex-none bg-s3 border border-line text-onvar rounded-lg font-medium cursor-pointer transition; padding:7px 12px;font-size:13px;white-space:nowrap; }
   .metric-chip.on{ @apply bg-primaryc border-primary; color:var(--onprimaryc); }
   .presets{ @apply flex flex-wrap gap-2; margin-bottom:12px; }
@@ -231,13 +232,14 @@ html,body,#root{height:100%;margin:0}
 .bchart-plot{position:relative;height:180px}
 .bchart-grid{position:absolute;inset:0;pointer-events:none}
 .bchart-grid i{position:absolute;left:0;right:0;height:1px;background:var(--line)}
-.bchart-ref{position:absolute;left:0;right:0;border-top:2px dashed var(--accent);opacity:.85;pointer-events:none}
-.bchart-ref span{position:absolute;right:0;top:-9px;font-size:10px;font-weight:700;color:var(--accent);background:var(--card);padding:0 5px;border-radius:6px;white-space:nowrap}
+.bchart-refline{position:absolute;left:0;right:0;border-top:2px dashed var(--accent);opacity:.9;pointer-events:none}
+.bchart-reflabel{position:absolute;left:0;right:0;height:0;pointer-events:none;z-index:3}
+.bchart-reflabel span{position:absolute;right:0;top:-9px;font-size:10px;font-weight:700;color:var(--accent);background:var(--card);padding:1px 6px;border-radius:7px;white-space:nowrap;box-shadow:0 0 0 1px var(--line)}
+.bchart-reflabel span.left{right:auto;left:0}
 .bchart-bars{position:absolute;inset:0;display:flex;align-items:flex-end}
 .bchart-col{flex:1;display:flex;align-items:flex-end;justify-content:center;height:100%;min-width:0}
 .bchart-bar{width:62%;max-width:26px;background:var(--data);border-radius:5px 5px 2px 2px;min-height:2px;transition:height .45s cubic-bezier(.2,.8,.2,1)}
 .bchart-bar.over{background:var(--danger)}
-.bchart-avg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .bchart-xaxis{display:flex;margin-top:7px}
 .bchart-xaxis span{flex:1;text-align:center;font-size:10px;color:var(--muted);min-width:0;overflow:hidden;white-space:nowrap;font-variant-numeric:tabular-nums}
 .chart-legend{display:flex;gap:14px;justify-content:center;margin-top:12px;font-size:12px;color:var(--muted);flex-wrap:wrap}
@@ -516,31 +518,27 @@ function Donut({segments,size=116,stroke=16,center}){
     {center!=null&&<div className="donut-center">{center}</div>}
   </div>);
 }
-function niceMax(v){ if(v<=0)return 1; const p=Math.pow(10,Math.floor(Math.log10(v))); const n=v/p; const s=n<=1?1:n<=1.5?1.5:n<=2?2:n<=3?3:n<=5?5:n<=7?7:10; return s*p; }
+function niceMax(v){ if(v<=0)return 1; const p=Math.pow(10,Math.floor(Math.log10(v))); const n=v/p; const s=n<=1?1:n<=1.2?1.2:n<=1.5?1.5:n<=2?2:n<=2.5?2.5:n<=3?3:n<=3.5?3.5:n<=4?4:n<=5?5:n<=6?6:n<=8?8:10; return s*p; }
 const fmtK=v=>v>=1000?(Math.round(v/100)/10)+'k':String(Math.round(v));
-const DayBars=({data,unit='',color='var(--data)',avg,refLabel='Budget'})=>{
+const DayBars=({data,unit='',color='var(--data)',refLabel='Budget'})=>{
   const refVal=(data.find(d=>d.ref!=null)||{}).ref;
-  const avgVals=avg?avg.filter(v=>v!=null):[];
-  const rawMax=Math.max(...data.map(d=>Math.max(d.value,d.ref||0)),...avgVals,1);
-  const max=niceMax(rawMax*1.05);
+  const rawMax=Math.max(...data.map(d=>Math.max(d.value,d.ref||0)),1);
+  const max=niceMax(rawMax*1.08);
   const n=data.length;
   const refPct=refVal!=null?(refVal/max)*100:null;
+  const refLeft=refPct!=null&&refPct>72; // put label on the left when the budget line sits high (avoids tall right-hand bars)
   const step=n<=14?1:Math.ceil(n/8);
-  let poly=null;
-  if(avg){const pts=avg.map((v,i)=>v==null?null:`${((i+0.5)/n*100).toFixed(2)},${(100-(v/max)*100).toFixed(2)}`).filter(Boolean);if(pts.length>=2)poly=pts.join(' ');}
   return (<div className="bchart">
     <div className="bchart-yaxis"><span>{fmtK(max)}</span><span>{fmtK(max/2)}</span><span>0</span></div>
     <div className="bchart-main">
       <div className="bchart-plot">
         <div className="bchart-grid">{[0,25,50,75,100].map(y=><i key={y} style={{bottom:y+'%'}}/>)}</div>
-        {refPct!=null&&<div className="bchart-ref" style={{bottom:Math.min(refPct,100)+'%'}}><span>{refLabel} {Math.round(refVal)}</span></div>}
+        {refPct!=null&&<div className="bchart-refline" style={{bottom:Math.min(refPct,100)+'%'}}/>}
         <div className="bchart-bars">{data.map(d=>{const h=(d.value/max)*100;return (
           <div className="bchart-col" key={d.key} title={`${d.key}: ${d.value}${unit}`}>
             <div className={'bchart-bar'+(d.over?' over':'')} style={{height:Math.max(h,d.value>0?2:0)+'%',background:d.over?undefined:color}}/>
           </div>);})}</div>
-        {poly&&<svg className="bchart-avg" viewBox="0 0 100 100" preserveAspectRatio="none">
-          <polyline points={poly} fill="none" stroke="var(--card)" strokeWidth="4.5" strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke"/>
-          <polyline points={poly} fill="none" stroke="var(--onsurf)" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" opacity="0.72" vectorEffect="non-scaling-stroke"/></svg>}
+        {refPct!=null&&<div className="bchart-reflabel" style={{bottom:Math.min(refPct,100)+'%'}}><span className={refLeft?'left':''}>{refLabel} {Math.round(refVal)}</span></div>}
       </div>
       <div className="bchart-xaxis">{data.map((d,i)=><span key={d.key}>{i%step===0?d.key.slice(8):''}</span>)}</div>
     </div>
@@ -938,7 +936,6 @@ function Stats({state,setDate,goToToday}){
   const tVals=chartData.map((d,i)=>rows[i].has?d.value:null);
   const present=tVals.filter(v=>v!=null);
   const mAvg=avgArr(present);
-  const avgLine=tVals.map((_,i)=>{let s=0,c=0;for(let j=Math.max(0,i-6);j<=i;j++){if(tVals[j]!=null){s+=tVals[j];c++;}}return c?Math.round((s/c)*10)/10:null;});
   const half=Math.floor(present.length/2);
   const trend=present.length>=4?avgArr(present.slice(half))-avgArr(present.slice(0,half)):0;
 
@@ -981,8 +978,8 @@ function Stats({state,setDate,goToToday}){
           {tracked.length>0 && <div className="kpi"><span className="kpi-big" style={{color:METRIC_COLOR[metric]}}>{mAvg}</span><span className="kpi-unit">{mInfo.unit.trim()} Ø</span>{present.length>=4 && <span className={'trend '+(trend>0?'up':trend<0?'down':'flat')}>{trend>0?<><Icon name="trending_up"/> steigend</>:trend<0?<><Icon name="trending_down"/> fallend</>:<><Icon name="trending_flat"/> stabil</>}</span>}</div>}
         </div>
         <div className="metric-chips">{METRICS.map(m=>(<button key={m.id} className={'metric-chip'+(metric===m.id?' on':'')} onClick={()=>setMetric(m.id)}>{m.label}</button>))}</div>
-        <DayBars data={chartData} unit={mInfo.unit} color={METRIC_COLOR[metric]} avg={avgLine}/>
-        <div className="chart-legend"><span><i className="sw" style={{background:METRIC_COLOR[metric]}}/> Wert</span><span><i className="sw line"/> Ziel/Budget</span><span><i className="sw avgline"/> Ø 7 T</span><span><i className="sw danger"/> über Ziel</span></div>
+        <DayBars data={chartData} unit={mInfo.unit} color={METRIC_COLOR[metric]}/>
+        <div className="chart-legend"><span><i className="sw" style={{background:METRIC_COLOR[metric]}}/> Wert</span><span><i className="sw line"/> Ziel/Budget</span><span><i className="sw danger"/> über Ziel</span></div>
       </section>
 
       <section className="card">
