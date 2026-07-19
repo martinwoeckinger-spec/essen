@@ -15,32 +15,32 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.26.0/babel.min.js"></script>
 <style>
   :root{
-    --bg:#0a0a0a;--bg2:#111111;--card:#171717;--card2:#242424;--text:#fafafa;--muted:#9ca3af;
-    --accent:#f97316;--accent2:#fb923c;--danger:#ef4444;--track:#2c2c2c;
-    --protein:#34d399;--carbs:#38bdf8;--fat:#c084fc;--radius:14px;
+    --bg:#0a0a0b;--bg2:#101012;--card:#161618;--card2:#212124;--text:#f4f4f5;--muted:#a1a1aa;--faint:#71717a;
+    --accent:#f97316;--accent2:#fb923c;--accent-soft:rgba(249,115,22,.14);--danger:#f87171;--track:#28282c;
+    --protein:#34d399;--carbs:#38bdf8;--fat:#c084fc;--radius:16px;--radius-sm:12px;
     --fiber:#a3e635;--sugar:#f472b6;--satfat:#fb7185;--salt:#94a3b8;--data:#60a5fa;
-    --good:#22c55e;
+    --good:#22c55e;--line:rgba(255,255,255,.07);--shadow:0 1px 2px rgba(0,0,0,.5),0 10px 30px rgba(0,0,0,.28);
     --safe-bottom:env(safe-area-inset-bottom,0px);--safe-top:env(safe-area-inset-top,0px);
   }
   html{color-scheme:dark}
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body,#root{height:100%;margin:0}
-  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:16px}
+  body{background:radial-gradient(1100px 520px at 50% -8%,rgba(249,115,22,.06),transparent 62%),var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:16px;-webkit-font-smoothing:antialiased;letter-spacing:.01em}
   input,select,button,textarea{font-family:inherit;font-size:16px}
   .app{display:flex;flex-direction:column;height:100%;max-width:560px;margin:0 auto}
   .content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
   .page{padding:calc(var(--safe-top) + 12px) 14px 24px;display:flex;flex-direction:column;gap:14px}
-  .tabbar{display:flex;background:var(--bg2);border-top:1px solid #0b1220;padding-bottom:var(--safe-bottom)}
-  .tab{flex:1;background:none;border:none;color:var(--muted);padding:8px 0 6px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
+  .tabbar{display:flex;background:rgba(16,16,18,.8);backdrop-filter:blur(14px) saturate(1.3);-webkit-backdrop-filter:blur(14px) saturate(1.3);border-top:1px solid var(--line);padding-bottom:var(--safe-bottom)}
+  .tab{flex:1;background:none;border:none;color:var(--faint);padding:9px 0 7px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;transition:color .15s}
   .tab.active{color:var(--accent2)}
   .tab-icon{font-size:22px;line-height:1}.tab-label{font-size:11px;font-weight:600}
-  .card{background:var(--card);border-radius:var(--radius);padding:16px}
-  .card-title{margin:0 0 12px;font-size:15px;font-weight:700}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+  .card-title{margin:0 0 14px;font-size:14px;font-weight:700;letter-spacing:.01em}
   .datebar{display:flex;align-items:center;justify-content:space-between;gap:8px}
   .datebar-label{font-size:20px;font-weight:800;background:none;border:none;color:var(--text);cursor:pointer;padding:6px 10px;border-radius:10px}
   .datebar-label:hover{background:var(--card2)}
   .date-input{width:auto;max-width:200px;background:var(--card2);border:1px solid var(--track);color:var(--text);border-radius:10px;padding:8px 10px;font-weight:700;text-align:center}
-  .nav-btn{width:40px;height:40px;border-radius:12px;border:none;background:var(--card2);color:var(--text);font-size:22px;cursor:pointer}
+  .nav-btn{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--card2);color:var(--text);font-size:22px;cursor:pointer;transition:.15s}
   .nav-btn:disabled{opacity:.3}
   .toolbar{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
   .hero{display:flex;flex-direction:column;align-items:center;gap:16px}
@@ -54,23 +54,23 @@
   .macro{margin-bottom:12px}.macro:last-child{margin-bottom:0}
   .macro-head{display:flex;justify-content:space-between;font-size:14px;margin-bottom:5px}
   .macro-label{font-weight:600}.macro-num{font-weight:700}
-  .bar{height:9px;background:var(--track);border-radius:99px;overflow:hidden}
-  .bar-fill{height:100%;border-radius:99px;transition:width .3s}
+  .bar{height:8px;background:var(--track);border-radius:99px;overflow:hidden}
+  .bar-fill{height:100%;border-radius:99px;transition:width .45s cubic-bezier(.2,.8,.2,1)}
   .macro-top{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
   .macro-top .bars{flex:1;min-width:190px}
   .donut-wrap{position:relative;display:flex;align-items:center;justify-content:center}
   .donut-center{position:absolute;text-align:center;line-height:1.1}
   .donut-center b{font-size:20px}.donut-center .muted{font-size:11px}
-  .energy-row{display:flex;justify-content:space-between;padding:7px 0;font-size:14px;color:var(--muted);border-bottom:1px solid #0b122033}
+  .energy-row{display:flex;justify-content:space-between;padding:7px 0;font-size:14px;color:var(--muted);border-bottom:1px solid var(--line)}
   .energy-row strong{color:var(--text)}
   .energy-row.total{border-bottom:none;font-size:16px;color:var(--text);padding-top:12px}
   .energy-row.total strong{color:var(--accent2)}
   .section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px;flex-wrap:wrap}
   .section-head .card-title{margin:0}.section-actions{display:flex;gap:6px;flex-wrap:wrap}
-  .chip{background:var(--card2);border:none;color:var(--text);padding:6px 10px;border-radius:99px;font-size:13px;font-weight:600;cursor:pointer}
+  .chip{background:var(--card2);border:1px solid var(--line);color:var(--text);padding:7px 12px;border-radius:99px;font-size:13px;font-weight:600;cursor:pointer;transition:.15s}
   .empty{color:var(--muted);font-size:14px;margin:6px 0 0}
   .entries{list-style:none;margin:8px 0 0;padding:0}
-  .entry{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid #0b122044}
+  .entry{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
   .entry-main{flex:1;min-width:0}.entry-name{font-weight:600;display:block}
   .entry-qty{font-size:12px;color:var(--accent2)}.entry-macros{display:block;font-size:12px;color:var(--muted)}
   .entry-kcal{font-weight:800;font-variant-numeric:tabular-nums}.entry-kcal.burn{color:var(--accent2)}
@@ -93,7 +93,7 @@
   .seg{display:flex;gap:4px;background:var(--card2);padding:3px;border-radius:10px}
   .seg button{background:none;border:none;color:var(--muted);padding:6px 10px;border-radius:8px;font-weight:600;cursor:pointer}
   .seg button.on{background:var(--accent);color:#fff}.seg.full{width:100%}.seg.full button{flex:1}
-  .chart{position:relative;display:flex;align-items:flex-end;gap:4px;height:160px;padding-top:8px}
+  .chart{position:relative;display:flex;align-items:flex-end;gap:4px;height:160px;padding-top:8px;overflow:hidden}
   .chart-col{flex:1;display:flex;flex-direction:column;align-items:center;height:100%}
   .chart-bar-wrap{position:relative;flex:1;width:100%;display:flex;align-items:flex-end;justify-content:center}
   .chart-bar{width:70%;background:var(--data);border-radius:4px 4px 0 0;min-height:2px;transition:height .3s}
@@ -122,8 +122,27 @@
   .pct input[type=range]{width:100%;accent-color:var(--accent)}
   .footer-note{text-align:center;color:var(--muted);font-size:12px;padding:0 12px}
   .muted{color:var(--muted)}.small{font-size:12px}.warn{color:var(--protein)}.over{color:var(--danger)}
+  /* Premium-Bausteine */
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(108px,1fr));gap:10px}
+  .tiles .stat{background:var(--card2);border:1px solid var(--line);border-radius:var(--radius-sm);padding:13px 10px}
+  .tiles .stat-value{font-size:22px;letter-spacing:-.01em}
+  .section-label{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);font-weight:700;margin:14px 2px 6px}
+  .section-label:first-child{margin-top:2px}
+  .lede{color:var(--muted);font-size:13px;margin:0 0 12px;line-height:1.5}
+  .kpi{display:flex;align-items:baseline;gap:8px}
+  .kpi-big{font-size:30px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1}
+  .kpi-unit{color:var(--muted);font-size:14px;font-weight:600}
+  .trend{font-size:12px;font-weight:700;padding:2px 9px;border-radius:99px;align-self:center}
+  .trend.up{color:var(--good);background:rgba(34,197,94,.13)}
+  .trend.down{color:var(--danger);background:rgba(248,113,113,.13)}
+  .trend.flat{color:var(--muted);background:var(--card2)}
+  .divider{height:1px;background:var(--line);margin:14px 0}
+  .grid2{display:grid;grid-template-columns:1fr;gap:14px}
+  @media (min-width:760px){ .grid2{grid-template-columns:1fr 1fr} }
+  .arch-scroll{max-height:min(52vh,540px);overflow-y:auto;margin:0 -2px;padding:0 2px}
+  .arch-scroll::-webkit-scrollbar{width:8px}.arch-scroll::-webkit-scrollbar-thumb{background:var(--card2);border-radius:8px}
   .meal-group{margin-top:12px}
-  .meal-head{display:flex;justify-content:space-between;align-items:center;border-top:1px solid #0b122044;padding-top:10px}
+  .meal-head{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding-top:10px}
   .meal-title{font-size:14px;font-weight:700}
   .meal-kcal{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
   .entry-note{display:block;font-size:12px;color:var(--muted);font-style:italic;margin-top:2px}
@@ -140,7 +159,7 @@
   .weight-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
   .weight-row input{max-width:130px}
   .overlay{position:fixed;inset:0;z-index:50;background:var(--bg);max-width:560px;margin:0 auto;display:flex;flex-direction:column}
-  .overlay-head{display:flex;align-items:center;justify-content:space-between;padding:calc(var(--safe-top) + 12px) 14px 10px;border-bottom:1px solid #0b1220}
+  .overlay-head{display:flex;align-items:center;justify-content:space-between;padding:calc(var(--safe-top) + 12px) 14px 10px;border-bottom:1px solid var(--line)}
   .overlay-head h2{margin:0;font-size:18px}
   .overlay-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 14px calc(var(--safe-bottom) + 24px);display:flex;flex-direction:column;gap:14px}
   .import-cols{display:block;background:var(--bg);border:1px solid var(--track);border-radius:10px;padding:8px 10px;font-size:11px;color:var(--muted);margin:8px 0;line-height:1.6}
@@ -161,7 +180,7 @@
   .month-head{font-size:12px;color:var(--muted);font-weight:700;margin:6px 2px 8px;text-transform:uppercase;letter-spacing:.04em}
   .archive-card{padding:4px 16px}
   .archive-list{list-style:none;margin:0;padding:0}
-  .archive-day{display:flex;align-items:center;gap:6px;border-top:1px solid #0b122044}
+  .archive-day{display:flex;align-items:center;gap:6px;border-top:1px solid var(--line)}
   .archive-day:first-child{border-top:none}
   .archive-open{flex:1;display:flex;align-items:center;gap:12px;background:none;border:none;color:var(--text);padding:12px 0;cursor:pointer;text-align:left;min-width:0}
   .archive-date{display:flex;flex-direction:column;min-width:70px}
@@ -185,12 +204,13 @@
   @media (min-width:900px){
     body{font-size:15px}
     .app{flex-direction:row;max-width:1180px;height:100vh}
-    .tabbar{order:-1;flex-direction:column;width:236px;flex:0 0 236px;border-top:none;border-right:1px solid var(--card2);padding:18px 14px;gap:4px;align-items:stretch}
+    .tabbar{order:-1;flex-direction:column;width:240px;flex:0 0 240px;border-top:none;border-right:1px solid var(--line);background:var(--bg2);padding:20px 14px;gap:3px;align-items:stretch;backdrop-filter:none;-webkit-backdrop-filter:none}
     .brand{display:flex;align-items:center;gap:10px;padding:4px 12px 18px;font-weight:800;font-size:20px}
     .brand-icon{font-size:24px}
     .tab{flex:none;flex-direction:row;justify-content:flex-start;gap:12px;padding:11px 14px;border-radius:12px}
     .tab-icon{font-size:20px}.tab-label{font-size:14px;font-weight:600}
-    .tab.active{background:var(--card);color:var(--accent2)}
+    .tab.active{background:var(--accent-soft);color:var(--accent2);box-shadow:inset 3px 0 0 var(--accent)}
+    .tab:hover:not(.active){background:var(--card)}
     .page{max-width:880px;margin:0 auto;padding:28px 28px 44px}
     .page-dash{max-width:1060px}
     .page-dash .cols{display:grid;grid-template-columns:340px 1fr;gap:18px;align-items:start}
@@ -901,55 +921,87 @@ function Stats({state,setDate,goToToday}){
   const wPresent=wpts.filter(p=>p.value!=null);
   const wChange=wPresent.length>=2?Math.round((wPresent[wPresent.length-1].value-wPresent[0].value)*10)/10:null;
 
+  const shortDate=k=>{const[y,m,d]=k.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString('de-DE',{day:'numeric',month:'short',year:'numeric'});};
+  const weeklyKg=Math.round((avgDev*7/KCAL_PER_KG)*100)/100;
+  const proj4=Math.round((profile.weight+weeklyKg*4)*10)/10;
+  let etaWeeks=null,etaDate=null;
+  if(profile.targetWeight!=null && weeklyKg!==0){const delta=profile.targetWeight-profile.weight;if(Math.sign(delta)===Math.sign(weeklyKg)){etaWeeks=Math.ceil(Math.abs(delta)/Math.abs(weeklyKg));etaDate=shortDate(addDays(today,etaWeeks*7));}}
+  const enoughForProg=tracked.length>=3;
+
   return (
     <div className="page">
       <header className="chat-head"><h2>Auswertung</h2>
         <div className="seg">{[7,14,30,90].map(r=>(<button key={r} className={range===r?'on':''} onClick={()=>setRange(r)}>{r} T</button>))}</div></header>
 
+      <div className="tiles">
+        <Stat label="Ø Kalorien" value={avgTotals.calories} sub="kcal/Tag"/>
+        <Stat label="Ø Abweichung" value={(avgDev>0?'+':'')+avgDev} sub="kcal/Tag"/>
+        <Stat label="Im Budget" value={withinBudget+' / '+(tracked.length||0)}/>
+        <Stat label="Erfasste Tage" value={tracked.length+' / '+range}/>
+        <Stat label="🔥 Serie" value={streak} sub={streak===1?'Tag':'Tage'}/>
+      </div>
+
+      {tracked.length===0 && <p className="empty">Noch keine Daten im Zeitraum. Importiere oder erfasse Mahlzeiten.</p>}
+
       <section className="card">
-        <h3 className="card-title">Zeitverlauf</h3>
+        <div className="section-head"><h3 className="card-title">Zeitverlauf</h3>
+          {tracked.length>0 && <div className="kpi"><span className="kpi-big" style={{color:METRIC_COLOR[metric]}}>{mAvg}</span><span className="kpi-unit">{mInfo.unit.trim()} Ø</span>{present.length>=4 && <span className={'trend '+(trend>0?'up':trend<0?'down':'flat')}>{trend>0?'↑ steigend':trend<0?'↓ fallend':'→ stabil'}</span>}</div>}
+        </div>
         <div className="metric-chips">{METRICS.map(m=>(<button key={m.id} className={'metric-chip'+(metric===m.id?' on':'')} onClick={()=>setMetric(m.id)}>{m.label}</button>))}</div>
         <DayBars data={chartData} unit={mInfo.unit} color={METRIC_COLOR[metric]} avg={avgLine}/>
         <div className="chart-legend"><span><i className="sw" style={{background:METRIC_COLOR[metric]}}/> Wert</span><span><i className="sw line"/> Ziel/Budget</span><span><i className="sw avgline"/> Ø 7 T</span><span><i className="sw danger"/> über Ziel</span></div>
-        {tracked.length>0 &&
-          <div className="avg-row" style={{marginTop:12}}><span>Ø {mInfo.label}{present.length>=4&&<span className="muted small"> {trend>0?'↑ steigend':trend<0?'↓ fallend':'→ stabil'}</span>}</span><strong>{mAvg}{mInfo.unit}</strong></div>}
       </section>
 
       <section className="card">
-        <h3 className="card-title">📅 Kalender</h3>
-        <Heatmap days={days} profile={profile} goal={goal} onPick={k=>{setDate(k);goToToday();}}/>
+        <h3 className="card-title">🔮 Prognose</h3>
+        {!enoughForProg
+          ? <p className="empty">Noch zu wenig erfasste Tage ({tracked.length}) – ab ca. 3 Tagen gibt es eine Schätzung.</p>
+          : (<>
+            <div className="kpi"><span className="kpi-big" style={{color:weeklyKg<0?'var(--good)':weeklyKg>0?'var(--danger)':'var(--muted)'}}>{weeklyKg>0?'+':''}{weeklyKg}</span><span className="kpi-unit">kg / Woche</span></div>
+            <p className="lede" style={{marginTop:8}}>Bei aktuellem Schnitt: <strong>{avgDev>0?'+':''}{avgDev} kcal/Tag</strong> {avgDev<0?'Defizit':avgDev>0?'Überschuss':'auf Budget'}.</p>
+            <div className="divider"/>
+            <div className="energy-row"><span>Gewicht in 4 Wochen ≈</span><strong>{proj4} kg</strong></div>
+            {etaWeeks!=null
+              ? <div className="energy-row total"><span>Ziel {profile.targetWeight} kg voraussichtlich</span><strong>~{etaWeeks} Wo · {etaDate}</strong></div>
+              : (profile.targetWeight!=null
+                  ? <p className="muted small" style={{margin:'8px 0 0'}}>Mit dem aktuellen Trend wird {profile.targetWeight} kg nicht angesteuert – Ziel oder Defizit im Profil prüfen.</p>
+                  : <p className="muted small" style={{margin:'8px 0 0'}}>Setz im Profil ein Wunschgewicht für eine Zieldatum-Schätzung.</p>)}
+            <p className="muted small" style={{margin:'10px 0 0'}}>Schätzung auf Basis der Kalorienbilanz (≈ {KCAL_PER_KG} kcal/kg) – keine medizinische Beratung.</p>
+          </>)}
       </section>
 
-      {wPresent.length>0 && (
+      {wPresent.length>0
+        ? (<div className="grid2">
+            <section className="card">
+              <h3 className="card-title">⚖️ Gewichtsverlauf</h3>
+              <LineChart points={wpts} target={profile.targetWeight}/>
+              <div className="avg-row" style={{marginTop:8}}><span>Aktuell{wChange!=null&&<span className="muted small"> {wChange>0?'+':''}{wChange} kg im Zeitraum</span>}</span><strong>{wPresent[wPresent.length-1].value} kg</strong></div>
+            </section>
+            <section className="card">
+              <h3 className="card-title">📅 Kalender</h3>
+              <Heatmap days={days} profile={profile} goal={goal} onPick={k=>{setDate(k);goToToday();}}/>
+            </section>
+          </div>)
+        : (<section className="card">
+            <h3 className="card-title">📅 Kalender</h3>
+            <Heatmap days={days} profile={profile} goal={goal} onPick={k=>{setDate(k);goToToday();}}/>
+          </section>)}
+
+      <div className="grid2">
         <section className="card">
-          <h3 className="card-title">⚖️ Gewichtsverlauf</h3>
-          <LineChart points={wpts} target={profile.targetWeight}/>
-          <div className="avg-row" style={{marginTop:8}}><span>Aktuell{wChange!=null&&<span className="muted small"> {wChange>0?'+':''}{wChange} kg im Zeitraum</span>}</span><strong>{wPresent[wPresent.length-1].value} kg</strong></div>
+          <h3 className="card-title">Ø Makronährstoffe</h3>
+          <MacroBar label="Eiweiß" value={avgTotals.protein} target={avgTarget.protein} color="var(--protein)"/>
+          <MacroBar label="Kohlenhydrate" value={avgTotals.carbs} target={avgTarget.carbs} color="var(--carbs)"/>
+          <MacroBar label="Fett" value={avgTotals.fat} target={avgTarget.fat} color="var(--fat)"/>
         </section>
-      )}
-
-      <section className="card">
-        <h3 className="card-title">Kalorienbilanz {tracked.length>0?`(${tracked.length} Tage)`:''}</h3>
-        <div className="avg-row"><span>{balance<=0?'Defizit':'Überschuss'} gesamt</span><strong className={balance>0?'over':''}>{balance>0?'+':''}{balance} kcal</strong></div>
-        <p className="muted small" style={{marginBottom:0}}>≈ {balKg>0?'+':''}{balKg} kg geschätzte Veränderung im Zeitraum (≈ {KCAL_PER_KG} kcal/kg).</p>
-      </section>
-
-      <section className="card">
-        <h3 className="card-title">Durchschnitt {tracked.length>0?`(${tracked.length} erfasste Tage)`:''}</h3>
-        <div className="avg-row"><span>Ø Kalorien</span><strong>{avgTotals.calories} kcal</strong></div>
-        <div style={{height:12}}/>
-        <MacroBar label="Ø Eiweiß" value={avgTotals.protein} target={avgTarget.protein} color="var(--protein)"/>
-        <MacroBar label="Ø Kohlenhydrate" value={avgTotals.carbs} target={avgTarget.carbs} color="var(--carbs)"/>
-        <MacroBar label="Ø Fett" value={avgTotals.fat} target={avgTarget.fat} color="var(--fat)"/>
-      </section>
-
-      <section className="card">
-        <h3 className="card-title">Ø weitere Nährwerte</h3>
-        <MacroBar label="Ballaststoffe" value={avgTotals.fiber} target={goal.fiberGoal} color="var(--fiber)"/>
-        <MacroBar label="Zucker" value={avgTotals.sugar} target={goal.sugarLimit} color="var(--sugar)" limit/>
-        <MacroBar label="ges. Fettsäuren" value={avgTotals.saturatedFat} target={goal.satFatLimit} color="var(--satfat)" limit/>
-        <MacroBar label="Salz" value={avgTotals.salt} target={goal.saltLimit} color="var(--salt)" limit/>
-      </section>
+        <section className="card">
+          <h3 className="card-title">Ø weitere Nährwerte</h3>
+          <MacroBar label="Ballaststoffe" value={avgTotals.fiber} target={goal.fiberGoal} color="var(--fiber)"/>
+          <MacroBar label="Zucker" value={avgTotals.sugar} target={goal.sugarLimit} color="var(--sugar)" limit/>
+          <MacroBar label="ges. Fettsäuren" value={avgTotals.saturatedFat} target={goal.satFatLimit} color="var(--satfat)" limit/>
+          <MacroBar label="Salz" value={avgTotals.salt} target={goal.saltLimit} color="var(--salt)" limit/>
+        </section>
+      </div>
 
       <section className="card">
         <h3 className="card-title">Ø Kalorien nach Mahlzeit</h3>
@@ -959,22 +1011,12 @@ function Stats({state,setDate,goToToday}){
             <div className="bar"><div className="bar-fill" style={{width:(m.kcal/mealMax)*100+'%',background:'var(--data)'}}/></div>
           </div>))}
       </section>
-
-      <section className="card">
-        <h3 className="card-title">Tracking-Treue</h3>
-        <div className="energy-row"><span>Erfasste Tage (Zeitraum)</span><strong>{tracked.length} / {range}</strong></div>
-        <div className="energy-row"><span>Tage im Budget</span><strong>{withinBudget} / {tracked.length||0}</strong></div>
-        <div className="energy-row"><span>Ø Abweichung vom Budget</span><strong className={avgDev>0?'over':''}>{avgDev>0?'+':''}{avgDev} kcal</strong></div>
-        <div className="energy-row total"><span>🔥 Aktuelle Serie</span><strong>{streak} {streak===1?'Tag':'Tage'}</strong></div>
-      </section>
-
-      {tracked.length===0 && <p className="empty">Noch keine Daten im Zeitraum. Importiere oder erfasse Mahlzeiten.</p>}
     </div>
   );
 }
 
-/* ---------- Archiv ---------- */
-function Archive({state,setState,setDate,goToToday,openImport}){
+/* ---------- Archiv (im Profil eingebettet) ---------- */
+function ArchiveSection({state,setState,goDay}){
   const {profile,goal,days}=state;
   const [showExport,setShowExport]=useState(false);
   const [q,setQ]=useState('');
@@ -986,42 +1028,34 @@ function Archive({state,setState,setDate,goToToday,openImport}){
   const filtered=ql?dayList.filter(d=>d.foods.some(f=>f.name.toLowerCase().includes(ql))):dayList;
   const groups=useMemo(()=>{const map=new Map();filtered.forEach(d=>{const l=monthLabel(d.date);if(!map.has(l))map.set(l,[]);map.get(l).push(d);});return [...map.entries()];},[filtered]);
   const totalDays=dayList.length, totalEntries=dayList.reduce((a,d)=>a+d.foods.length,0);
-  const open=date=>{setDate(date);goToToday();};
   const del=date=>{if(confirm('Tag '+dateLabel(date)+' wirklich aus dem Archiv löschen?'))setState(s=>{const ds={...s.days};delete ds[date];return{...s,days:ds};});};
-
   return (
-    <div className="page">
-      <header className="chat-head"><h2>Archiv</h2>
-        <div className="section-actions">
-          <button className="chip" onClick={openImport}>📋 Import</button>
-          {totalEntries>0 && <button className="chip" onClick={()=>setShowExport(true)}>⬇ Export</button>}
-        </div></header>
+    <section className="card">
+      <div className="section-head"><h3 className="card-title">🗄️ Archiv{totalDays?(' · '+totalDays+(totalDays===1?' Tag':' Tage')):''}</h3>
+        <div className="section-actions">{totalEntries>0 && <button className="chip" onClick={()=>setShowExport(true)}>⬇ Export</button>}</div></div>
+      {totalDays===0 && <p className="empty" style={{margin:0}}>Noch keine Tage. Importiere deine Tabelle oder erfasse Mahlzeiten.</p>}
       {totalDays>0 && <input placeholder="🔎 Lebensmittel suchen…" value={q} onChange={e=>setQ(e.target.value)}/>}
-      {totalDays>0 &&
-        <section className="card"><div className="hero-stats">
-          <Stat label="erfasste Tage" value={totalDays}/>
-          <Stat label="Einträge" value={totalEntries}/>
-        </div></section>}
-      {totalDays===0 && <p className="empty">Noch keine Tage im Archiv. Importiere deine Tabelle oder erfasse Mahlzeiten unter „Heute".</p>}
       {ql && filtered.length===0 && <p className="empty">Keine Treffer für „{q}".</p>}
-      {groups.map(([month,list])=>(
-        <div key={month}>
-          <h3 className="month-head">{month}</h3>
-          <section className="card archive-card">
-            <ul className="archive-list">{list.map(d=>(
-              <li className="archive-day" key={d.date}>
-                <button className="archive-open" onClick={()=>open(d.date)}>
-                  <div className="archive-date"><span className="archive-wd">{weekdayShort(d.date)}</span><span className="archive-label">{dateLabel(d.date)}</span></div>
-                  <div className="archive-meta"><span className="muted small">E {d.totals.protein} · KH {d.totals.carbs} · F {d.totals.fat} g · {d.foods.length} Einträge</span></div>
-                  <div className={'archive-kcal'+(d.over?' over':'')}>{d.totals.calories}<span className="muted small"> / {d.budget}</span></div>
-                </button>
-                <button className="del" onClick={()=>del(d.date)}>×</button>
-              </li>))}</ul>
-          </section>
+      {totalDays>0 && (
+        <div className="arch-scroll" style={{marginTop:10}}>
+          {groups.map(([month,list])=>(
+            <div key={month}>
+              <div className="section-label">{month}</div>
+              <ul className="archive-list">{list.map(d=>(
+                <li className="archive-day" key={d.date}>
+                  <button className="archive-open" onClick={()=>goDay(d.date)}>
+                    <div className="archive-date"><span className="archive-wd">{weekdayShort(d.date)}</span><span className="archive-label">{dateLabel(d.date)}</span></div>
+                    <div className="archive-meta"><span className="muted small">E {d.totals.protein} · KH {d.totals.carbs} · F {d.totals.fat} g · {d.foods.length} Einträge</span></div>
+                    <div className={'archive-kcal'+(d.over?' over':'')}>{d.totals.calories}<span className="muted small"> / {d.budget}</span></div>
+                  </button>
+                  <button className="del" onClick={()=>del(d.date)}>×</button>
+                </li>))}</ul>
+            </div>
+          ))}
         </div>
-      ))}
+      )}
       {showExport && <ExportOverlay days={days} onClose={()=>setShowExport(false)}/>}
-    </div>
+    </section>
   );
 }
 function ExportOverlay({days,onClose}){
@@ -1050,7 +1084,7 @@ function ExportOverlay({days,onClose}){
 
 /* ---------- Profil ---------- */
 const PRESETS=[{mode:'lose',label:'Abnehmen (−500)',adj:-500},{mode:'lose',label:'Leicht abnehmen (−300)',adj:-300},{mode:'maintain',label:'Halten (±0)',adj:0},{mode:'gain',label:'Aufbauen (+300)',adj:300},{mode:'gain',label:'Aufbauen (+500)',adj:500}];
-function Profile({state,setState,notify}){
+function Profile({state,setState,notify,setDate,goToDash}){
   const {profile,goal}=state;
   const fileRef=useRef(null);
   const setP=p=>setState(s=>({...s,profile:{...s.profile,...p}}));
@@ -1066,11 +1100,11 @@ function Profile({state,setState,notify}){
   return (
     <div className="page">
       <header className="chat-head"><h2>Profil &amp; Wünsche</h2></header>
-      <section className="card"><div className="hero-stats">
+      <div className="tiles">
         <Stat label="Grundumsatz" value={bmr(profile)} sub="kcal/Tag"/>
         <Stat label="Erhaltung" value={maintenance(profile)} sub="kcal/Tag"/>
         <Stat label="Budget-Ziel" value={maintenance(profile)+goal.adjustment} sub="kcal/Tag"/>
-      </div></section>
+      </div>
 
       <section className="card">
         <h3 className="card-title">Über dich</h3>
@@ -1130,6 +1164,8 @@ function Profile({state,setState,notify}){
         <textarea className="pref-text" placeholder="z.B. vegetarisch, keine Laktose, mag kein Fisch, viel Gemüse …" value={goal.preferences} onChange={e=>setG({preferences:e.target.value})} rows={3}/>
       </section>
 
+      <ArchiveSection state={state} setState={setState} goDay={d=>{setDate(d);goToDash();}}/>
+
       <section className="card">
         <h3 className="card-title">💾 Daten &amp; Sicherung</h3>
         <p className="muted small" style={{marginTop:0}}>Alle Daten liegen nur in diesem Browser. Lade regelmäßig ein Backup herunter, damit nichts verloren geht.</p>
@@ -1146,7 +1182,7 @@ function Profile({state,setState,notify}){
 }
 
 /* ---------- App ---------- */
-const TABS=[{id:'dashboard',label:'Dashboard',icon:'🏠'},{id:'today',label:'Heute',icon:'🍽️'},{id:'stats',label:'Analyse',icon:'📊'},{id:'archive',label:'Archiv',icon:'🗄️'},{id:'profile',label:'Profil',icon:'⚙️'}];
+const TABS=[{id:'dashboard',label:'Dashboard',icon:'🏠'},{id:'today',label:'Heute',icon:'🍽️'},{id:'stats',label:'Analyse',icon:'📊'},{id:'profile',label:'Profil',icon:'⚙️'}];
 function App(){
   const [state,setState]=useState(load);
   const [tab,setTab]=useState('dashboard');
@@ -1179,9 +1215,8 @@ function App(){
       <main className="content">
         {tab==='dashboard' && <Dashboard state={state} setState={setState} date={date} setDate={setDate} openImport={()=>setImportOpen(true)}/>}
         {tab==='today' && <Today state={state} setState={setState} date={date} setDate={setDate} openImport={()=>setImportOpen(true)} notify={notify}/>}
-        {tab==='stats' && <Stats state={state} setDate={setDate} goToToday={()=>setTab('today')}/>}
-        {tab==='archive' && <Archive state={state} setState={setState} setDate={setDate} goToToday={()=>setTab('today')} openImport={()=>setImportOpen(true)}/>}
-        {tab==='profile' && <Profile state={state} setState={setState} notify={notify}/>}
+        {tab==='stats' && <Stats state={state} setDate={setDate} goToToday={()=>setTab('dashboard')}/>}
+        {tab==='profile' && <Profile state={state} setState={setState} notify={notify} setDate={setDate} goToDash={()=>setTab('dashboard')}/>}
       </main>
       <nav className="tabbar">
         <div className="brand"><span className="brand-icon">🍊</span><span className="brand-name">Essen</span></div>
