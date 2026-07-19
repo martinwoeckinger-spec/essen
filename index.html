@@ -16,27 +16,44 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 <style type="text/tailwindcss">
 @theme {
-  --color-surface:#131316; --color-s1:#191a1e; --color-s2:#202127; --color-s3:#282a30; --color-s4:#31323a;
-  --color-onsurf:#e6e1e6; --color-onvar:#b8b5bf; --color-faint:#8a8792;
-  --color-primary:#f97316; --color-onprimary:#ffffff; --color-primaryc:#5a3410; --color-onprimaryc:#ffd9bd;
-  --color-line:rgba(255,255,255,.08); --color-danger:#f87171;
+  --color-surface:#f6f3ef; --color-s1:#fffdfb; --color-s2:#ffffff; --color-s3:#f0ebe4; --color-s4:#e7e1d8;
+  --color-onsurf:#211f1c; --color-onvar:#55524c; --color-faint:#8a857e;
+  --color-primary:#e05e00; --color-onprimary:#ffffff; --color-primaryc:#ffdcc2; --color-onprimaryc:#6d3500;
+  --color-line:rgba(0,0,0,.09); --color-danger:#c0341d;
   --radius-card:20px;
   --font-sans:'Roboto','system-ui',-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;
 }
 :root{
+  color-scheme:light;
+  --bg:#f6f3ef;--bg2:#efeae3;--card:#ffffff;--card2:#f0ebe4;--text:#211f1c;--muted:#55524c;--faint:#8a857e;
+  --accent:#e05e00;--accent2:#b24a00;--accent-soft:rgba(224,94,0,.12);--primaryc:#ffdcc2;--onprimaryc:#6d3500;
+  --danger:#c0341d;--track:#e6dfd5;--line:rgba(0,0,0,.09);
+  --protein:#059669;--carbs:#0284c7;--fat:#9333ea;--fiber:#65a30d;--sugar:#db2777;--satfat:#e11d48;--salt:#64748b;--data:#2563eb;--good:#16a34a;
+  --bar-bg:rgba(255,255,255,.82);--toast-bg:#33302c;--toast-fg:#f6f1ea;--scrim:rgba(30,20,10,.32);
+  --shadow-card:0 1px 2px rgba(70,50,25,.05),0 5px 16px rgba(70,50,25,.07);
+  --radius:20px;--radius-sm:12px;
+  --safe-bottom:env(safe-area-inset-bottom,0px);--safe-top:env(safe-area-inset-top,0px);
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --color-surface:#131316;--color-s1:#191a1e;--color-s2:#202127;--color-s3:#282a30;--color-s4:#31323a;
+  --color-onsurf:#e6e1e6;--color-onvar:#b8b5bf;--color-faint:#8a8792;
+  --color-primary:#f97316;--color-onprimary:#ffffff;--color-primaryc:#5a3410;--color-onprimaryc:#ffd9bd;
+  --color-line:rgba(255,255,255,.08);--color-danger:#f87171;
   --bg:#131316;--bg2:#191a1e;--card:#202127;--card2:#282a30;--text:#e6e1e6;--muted:#b8b5bf;--faint:#8a8792;
   --accent:#f97316;--accent2:#fdba74;--accent-soft:rgba(249,115,22,.16);--primaryc:#5a3410;--onprimaryc:#ffd9bd;
   --danger:#f87171;--track:#3a3b42;--line:rgba(255,255,255,.08);
   --protein:#34d399;--carbs:#38bdf8;--fat:#c084fc;--fiber:#a3e635;--sugar:#f472b6;--satfat:#fb7185;--salt:#94a3b8;--data:#7cc0ff;--good:#22c55e;
-  --radius:20px;--radius-sm:12px;
-  --safe-bottom:env(safe-area-inset-bottom,0px);--safe-top:env(safe-area-inset-top,0px);
+  --bar-bg:rgba(20,20,24,.82);--toast-bg:#e8e3ea;--toast-fg:#26272e;--scrim:rgba(0,0,0,.6);
+  --shadow-card:0 1px 3px rgba(0,0,0,.5),0 6px 16px rgba(0,0,0,.22);
 }
-html{color-scheme:dark}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body,#root{height:100%;margin:0}
+.msym{font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;word-wrap:normal;direction:ltr;font-feature-settings:'liga';-webkit-font-smoothing:antialiased;font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 24;vertical-align:middle;user-select:none}
 @layer base{
   body{ @apply bg-surface text-onsurf font-sans antialiased; font-size:15px; }
   input,select,button,textarea{ font-family:inherit; }
@@ -46,30 +63,40 @@ html,body,#root{height:100%;margin:0}
   .app{ @apply flex flex-col h-full mx-auto; max-width:560px; }
   .content{ @apply flex-1 overflow-y-auto; -webkit-overflow-scrolling:touch; }
   .page{ @apply flex flex-col gap-4; padding:calc(var(--safe-top) + 12px) 16px 28px; }
-  .card{ @apply bg-s2 border border-line rounded-[20px] p-5; box-shadow:0 1px 3px rgba(0,0,0,.5),0 6px 16px rgba(0,0,0,.22); }
-  .card-title{ @apply text-sm font-bold text-onsurf; margin:0 0 14px; letter-spacing:.01em; }
+  .card{ @apply bg-s2 border border-line rounded-[20px] p-5; box-shadow:var(--shadow-card); }
+  .card-title{ @apply flex items-center gap-2 text-sm font-bold text-onsurf; margin:0 0 14px; letter-spacing:.01em; }
+  .card-title .msym{ font-size:20px; color:var(--accent); }
   .chat-head{ @apply flex justify-between items-center gap-2 flex-wrap; }
   .section-head{ @apply flex justify-between items-center gap-2 flex-wrap; margin-bottom:10px; }
   .section-head .card-title{ margin:0; }
   .section-actions{ @apply flex gap-1.5 flex-wrap; }
   .section-label{ @apply text-onvar; font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;margin:14px 2px 6px; }
-  .tabbar{ @apply flex border-t border-line; background:rgba(20,20,24,.82);backdrop-filter:blur(16px) saturate(1.4);-webkit-backdrop-filter:blur(16px) saturate(1.4);padding-bottom:var(--safe-bottom); }
+  .tabbar{ @apply flex border-t border-line; background:var(--bar-bg);backdrop-filter:blur(16px) saturate(1.4);-webkit-backdrop-filter:blur(16px) saturate(1.4);padding-bottom:var(--safe-bottom); }
   .tab{ @apply flex-1 flex flex-col items-center gap-1 bg-transparent border-0 text-faint cursor-pointer transition-colors; padding:9px 0 7px; }
-  .tab-icon{ @apply rounded-full transition-colors; font-size:22px;line-height:1;padding:4px 20px; }
+  .tab-icon{ @apply flex items-center justify-center rounded-full transition-colors; font-size:22px;line-height:1;padding:4px 20px; }
   .tab-label{ font-size:11px;font-weight:500; }
-  .tab.active{ @apply text-onsurf; }
-  .tab.active .tab-icon{ @apply bg-primaryc; }
+  .tab.active{ @apply text-primary; }
+  .tab.active .tab-icon{ @apply bg-primaryc; color:var(--onprimaryc); }
+  .tab.active .tab-icon .msym{ font-variation-settings:'FILL' 1,'wght' 500,'GRAD' 0,'opsz' 24; }
+  .theme-toggle{ @apply text-onvar; }
   .brand{ @apply hidden; }
-  .brand-icon{ font-size:24px; }
-  .primary{ @apply bg-primary text-onprimary border-0 rounded-full font-semibold cursor-pointer transition; padding:12px 24px;box-shadow:0 1px 3px rgba(0,0,0,.4); }
-  .erfassen-btn{ @apply block w-full bg-primary text-onprimary border-0 rounded-[20px] font-bold cursor-pointer transition; padding:16px;font-size:16px;box-shadow:0 6px 20px rgba(249,115,22,.38); }
-  .chip{ @apply inline-flex items-center gap-1 bg-s3 border border-line text-onsurf rounded-lg font-medium cursor-pointer transition; padding:7px 12px;font-size:13px; }
-  .nav-btn{ @apply grid place-items-center bg-s3 text-onsurf border-0 rounded-full cursor-pointer transition; width:40px;height:40px;font-size:22px; }
+  .brand-icon{ font-size:24px;color:var(--accent); }
+  .primary{ @apply inline-flex items-center justify-center gap-1.5 bg-primary text-onprimary border-0 rounded-full font-semibold cursor-pointer transition; padding:12px 24px;box-shadow:0 1px 2px rgba(0,0,0,.16); }
+  .primary .msym{ font-size:19px; }
+  .erfassen-btn{ @apply flex items-center justify-center gap-2 w-full bg-primary text-onprimary border-0 rounded-[20px] font-bold cursor-pointer transition; padding:16px;font-size:16px;box-shadow:0 6px 20px rgba(224,94,0,.30); }
+  .erfassen-btn .msym{ font-size:22px; }
+  .chip{ @apply inline-flex items-center gap-1.5 bg-s3 border border-line text-onsurf rounded-lg font-medium cursor-pointer transition; padding:7px 12px;font-size:13px; }
+  .chip .msym{ font-size:17px;margin:0 -1px; }
+  .nav-btn{ @apply grid place-items-center bg-s3 text-onsurf border-0 rounded-full cursor-pointer transition; width:40px;height:40px; }
+  .nav-btn .msym{ font-size:22px; }
   .nav-btn:disabled{ opacity:.3; }
-  .del{ @apply grid place-items-center bg-transparent text-onvar border-0 rounded-full cursor-pointer transition; width:32px;height:32px;font-size:20px; }
-  .icon-btn{ @apply grid place-items-center bg-transparent text-onvar border-0 rounded-full cursor-pointer transition; width:32px;height:32px;font-size:14px; }
+  .del{ @apply grid place-items-center bg-transparent text-onvar border-0 rounded-full cursor-pointer transition; width:32px;height:32px; }
+  .del .msym{ font-size:20px; }
+  .icon-btn{ @apply grid place-items-center bg-transparent text-onvar border-0 rounded-full cursor-pointer transition; width:32px;height:32px; }
+  .icon-btn .msym{ font-size:18px; }
   input,select,textarea{ @apply bg-s3 border border-line text-onsurf rounded-xl w-full outline-none transition; padding:12px 13px;font-size:15px; }
   input:focus,select:focus,textarea:focus{ @apply border-primary; box-shadow:0 0 0 3px var(--accent-soft); }
+  input::placeholder,textarea::placeholder{ color:var(--faint); }
   textarea{ resize:vertical; }
   .form{ @apply flex flex-col gap-2; margin:8px 0 12px; }
   .form-grid{ @apply grid gap-2; grid-template-columns:repeat(4,1fr); }
@@ -103,17 +130,21 @@ html,body,#root{height:100%;margin:0}
   .tiles .stat{ @apply bg-s2 border border-line rounded-2xl; padding:14px 10px; }
   .stat{ @apply text-center; flex:1; }
   .stat-value{ font-weight:800;font-size:22px;letter-spacing:-.01em; }
-  .stat-label{ @apply text-onvar; font-size:12px; } .stat-sub{ @apply text-onvar; font-size:11px; }
+  .stat-label{ @apply flex items-center justify-center gap-1 text-onvar; font-size:12px; } .stat-sub{ @apply text-onvar; font-size:11px; }
+  .stat-label .msym{ font-size:15px;color:var(--accent); }
   .hero-stats{ @apply flex w-full justify-around; }
   .hero{ @apply flex flex-col items-center gap-4; }
   .datebar{ @apply flex items-center justify-between gap-2; }
-  .datebar-label{ @apply bg-transparent border-0 text-onsurf cursor-pointer rounded-xl; font-size:20px;font-weight:800;padding:6px 10px; }
+  .datebar-label{ @apply inline-flex items-center gap-1 bg-transparent border-0 text-onsurf cursor-pointer rounded-xl; font-size:20px;font-weight:800;padding:6px 10px; }
+  .datebar-label .msym{ font-size:22px;color:var(--onvar); }
   .datebar-label:hover{ @apply bg-s3; }
   .date-input{ @apply bg-s3 border border-line text-onsurf rounded-xl; text-align:center;padding:8px 10px;font-weight:700;max-width:200px;width:auto; }
   .toolbar{ @apply flex gap-1.5 flex-wrap justify-center; }
   .macro{ margin-bottom:12px; } .macro:last-child{ margin-bottom:0; }
   .macro-head{ @apply flex justify-between; font-size:14px;margin-bottom:6px; }
   .macro-label{ font-weight:600; } .macro-num{ font-weight:700; }
+  .warn-tag{ @apply inline-flex; color:var(--danger); }
+  .warn-tag .msym{ font-size:15px; }
   .bar{ @apply rounded-full overflow-hidden; height:8px;background:var(--track); }
   .bar-fill{ @apply rounded-full; height:100%;transition:width .45s cubic-bezier(.2,.8,.2,1); }
   .macro-top{ @apply flex gap-4 items-center flex-wrap; }
@@ -121,8 +152,8 @@ html,body,#root{height:100%;margin:0}
   .energy-row{ @apply flex justify-between text-onvar; font-size:14px;padding:8px 0;border-bottom:1px solid var(--line); }
   .energy-row strong{ @apply text-onsurf; }
   .energy-row.total{ @apply text-onsurf; border-bottom:none;font-size:16px;padding-top:12px; }
-  .energy-row.total strong{ color:var(--accent2); }
-  .avg-row{ @apply flex justify-between; font-size:16px; } .avg-row strong{ color:var(--accent2); }
+  .energy-row.total strong{ color:var(--accent); }
+  .avg-row{ @apply flex justify-between; font-size:16px; } .avg-row strong{ color:var(--accent); }
   .empty{ @apply text-onvar; font-size:14px;margin:6px 0 0; }
   .entries{ @apply list-none p-0; margin:8px 0 0; }
   .entry{ @apply flex items-center gap-2.5; padding:11px 0;border-top:1px solid var(--line); }
@@ -136,15 +167,17 @@ html,body,#root{height:100%;margin:0}
   .entry-actions{ @apply flex items-center; gap:2px; }
   .meal-group{ margin-top:12px; }
   .meal-head{ @apply flex justify-between items-center; padding-top:10px;border-top:1px solid var(--line); }
-  .meal-title{ font-size:14px;font-weight:700; }
+  .meal-title{ @apply flex items-center gap-2; font-size:14px;font-weight:700; }
+  .meal-title .msym{ font-size:19px;color:var(--accent); }
   .meal-kcal{ @apply text-onvar; font-size:13px;font-variant-numeric:tabular-nums; }
   .lede{ @apply text-onvar; font-size:13px;margin:0 0 12px;line-height:1.5; }
   .kpi{ @apply flex items-baseline gap-2; }
   .kpi-big{ font-weight:800;font-size:30px;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1; }
   .kpi-unit{ @apply text-onvar; font-size:14px;font-weight:600; }
-  .trend{ @apply rounded-full self-center; font-size:12px;font-weight:700;padding:2px 9px; }
-  .trend.up{ color:var(--good);background:rgba(34,197,94,.14); }
-  .trend.down{ color:var(--danger);background:rgba(248,113,113,.14); }
+  .trend{ @apply inline-flex items-center gap-1 rounded-full self-center; font-size:12px;font-weight:700;padding:2px 9px; }
+  .trend .msym{ font-size:15px; }
+  .trend.up{ color:var(--good);background:color-mix(in srgb,var(--good) 15%,transparent); }
+  .trend.down{ color:var(--danger);background:color-mix(in srgb,var(--danger) 15%,transparent); }
   .trend.flat{ color:var(--muted);background:var(--card2); }
   .divider{ height:1px;background:var(--line);margin:14px 0; }
   .archive-list{ @apply list-none m-0 p-0; }
@@ -164,16 +197,17 @@ html,body,#root{height:100%;margin:0}
   .import-cols{ @apply block bg-s1 border border-line rounded-xl text-onvar; padding:8px 10px;font-size:11px;margin:8px 0;line-height:1.6; }
   .import-text{ font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px; }
   .import-actions{ @apply flex gap-2 flex-wrap; margin-top:8px; }
-  .import-warn{ border-color:#7c2d12; }
+  .import-warn{ border-color:var(--danger); }
   .err-list{ @apply list-none m-0 p-0 flex flex-col gap-2; font-size:13px; }
   .ellipsis{ @apply overflow-hidden; white-space:nowrap;text-overflow:ellipsis; }
-  .import-success{ font-weight:700;font-size:16px;margin:0 0 8px; }
+  .import-success{ @apply flex items-center gap-2; font-weight:700;font-size:16px;margin:0 0 8px; }
+  .import-success .msym{ color:var(--good);font-size:22px; }
   .import-submit{ width:100%; }
   .preview-meal{ margin-top:8px; }
   .preview-meal-head{ font-size:13px;font-weight:700;color:var(--accent2);margin:6px 0 2px; }
   .preview-row{ @apply flex justify-between gap-2.5; font-size:13px;padding:3px 0; }
   .preview-name{ min-width:0; } .preview-kcal{ @apply text-onvar; white-space:nowrap; }
-  .toast{ @apply fixed left-1/2 rounded-lg font-semibold z-[80]; transform:translateX(-50%);background:#e8e3ea;color:#26272e;padding:12px 16px;font-size:14px;bottom:calc(var(--safe-bottom) + 76px);box-shadow:0 8px 24px rgba(0,0,0,.5); }
+  .toast{ @apply fixed left-1/2 rounded-lg font-semibold z-[80]; transform:translateX(-50%);background:var(--toast-bg);color:var(--toast-fg);padding:12px 16px;font-size:14px;bottom:calc(var(--safe-bottom) + 76px);box-shadow:0 8px 24px rgba(0,0,0,.28); }
   .footer-note{ @apply text-center text-onvar; font-size:12px;padding:0 12px; }
   .muted{ @apply text-onvar; } .small{ font-size:12px; } .warn{ color:var(--protein); } .over{ color:var(--danger); }
 }
@@ -207,10 +241,12 @@ html,body,#root{height:100%;margin:0}
 .arch-scroll{max-height:min(52vh,540px);overflow-y:auto;margin:0 -2px;padding:0 2px}
 .arch-scroll::-webkit-scrollbar{width:8px}.arch-scroll::-webkit-scrollbar-thumb{background:var(--card2);border-radius:8px}
 @media (hover:hover){
-  .chip:hover,.preset:hover,.nav-btn:hover,.metric-chip:hover,.seg button:hover{filter:brightness(1.12)}
-  .primary:hover,.erfassen-btn:hover{filter:brightness(1.06)}
+  .chip:hover,.preset:hover,.nav-btn:hover,.metric-chip:hover,.seg button:hover{filter:brightness(.98)}
+  :root[data-theme="dark"] .chip:hover,:root[data-theme="dark"] .preset:hover,:root[data-theme="dark"] .nav-btn:hover,:root[data-theme="dark"] .metric-chip:hover,:root[data-theme="dark"] .seg button:hover{filter:brightness(1.12)}
+  .primary:hover,.erfassen-btn:hover{filter:brightness(1.04)}
   .icon-btn:hover,.del:hover{background:var(--card2);color:var(--accent2)}
   .del:hover{color:var(--danger)}
+  .theme-toggle:hover{color:var(--accent)}
 }
 @media (min-width:760px){ .grid2{grid-template-columns:1fr 1fr} }
 @media (min-width:900px){
@@ -219,18 +255,19 @@ html,body,#root{height:100%;margin:0}
   .tabbar{order:-1;flex-direction:column;width:248px;flex:0 0 248px;border-top:none;border-right:1px solid var(--line);background:var(--bg2);padding:20px 12px;gap:4px;align-items:stretch;backdrop-filter:none;-webkit-backdrop-filter:none}
   .brand{display:flex;align-items:center;gap:10px;padding:6px 12px 18px;font-weight:800;font-size:20px}
   .tab{flex:none;flex-direction:row;justify-content:flex-start;gap:14px;padding:12px 16px;border-radius:9999px}
-  .tab .tab-icon{padding:0;background:transparent;font-size:20px}
+  .tab .tab-icon{padding:0;background:transparent;font-size:22px}
   .tab-label{font-size:14px;font-weight:600}
   .tab.active{background:var(--primaryc);color:var(--onprimaryc)}
-  .tab.active .tab-icon{background:transparent}
-  .tab:hover:not(.active){background:var(--card)}
+  .tab.active .tab-icon{background:transparent;color:var(--onprimaryc)}
+  .tab:hover:not(.active){background:var(--card2)}
+  .theme-toggle{margin-top:auto}
   .page{max-width:900px;margin:0 auto;padding:28px 28px 44px}
   .page-dash{max-width:1080px}
   .page-dash .cols{display:grid;grid-template-columns:340px 1fr;gap:18px;align-items:start}
   .datebar-label{font-size:22px}
   .toast{bottom:24px}
-  .overlay{align-items:flex-start;justify-content:center;background:rgba(0,0,0,.6);max-width:none;margin:0;padding:48px 16px}
-  .overlay-card{flex:none;width:100%;max-width:760px;max-height:84vh;background:var(--card2);border:1px solid var(--line);border-radius:28px;overflow:hidden}
+  .overlay{align-items:flex-start;justify-content:center;background:var(--scrim);max-width:none;margin:0;padding:48px 16px}
+  .overlay-card{flex:none;width:100%;max-width:760px;max-height:84vh;background:var(--card);border:1px solid var(--line);border-radius:28px;overflow:hidden;box-shadow:var(--shadow-card)}
   .overlay-head{padding:18px 20px}.overlay-body{padding:16px 20px 24px}
 }
 @media (min-width:1280px){ .app{max-width:1320px}.page-dash{max-width:1180px}.page-dash .cols{grid-template-columns:360px 1fr} }
@@ -243,18 +280,24 @@ html,body,#root{height:100%;margin:0}
   .card{border:1px solid #ddd;break-inside:avoid;margin-bottom:10px;box-shadow:none}
 }
 </style>
+<script>try{var _s=JSON.parse(localStorage.getItem('essen-artifact'));if(_s&&_s.ui&&_s.ui.theme==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(_e){}</script>
 </head>
 <body>
 <div id="root"></div>
 <script type="text/babel" data-presets="react">
 const { useState, useEffect, useRef, useMemo } = React;
 
+/* ---------- Icon (Google Material Symbols) ---------- */
+const Icon = ({name,className,style}) => (
+  <span className={'msym'+(className?' '+className:'')} style={style} aria-hidden="true">{name}</span>
+);
+
 /* ---------- Mahlzeiten ---------- */
 const MEALS={
-  breakfast:{label:'Frühstück',icon:'🌅',hour:8,order:0},
-  lunch:{label:'Mittagessen',icon:'☀️',hour:12,order:1},
-  dinner:{label:'Abendessen',icon:'🌙',hour:19,order:2},
-  snack:{label:'Snack',icon:'🍎',hour:16,order:3},
+  breakfast:{label:'Frühstück',icon:'bakery_dining',hour:8,order:0},
+  lunch:{label:'Mittagessen',icon:'lunch_dining',hour:12,order:1},
+  dinner:{label:'Abendessen',icon:'dinner_dining',hour:19,order:2},
+  snack:{label:'Snack',icon:'cookie',hour:16,order:3},
 };
 const MEAL_ORDER=Object.keys(MEALS).sort((a,b)=>MEALS[a].order-MEALS[b].order);
 const defaultMeal=()=>{const h=new Date().getHours();return h<11?'breakfast':h<15?'lunch':h<18?'snack':'dinner';};
@@ -368,7 +411,7 @@ const IMPORT_EXAMPLE=[
 const DEFAULTS = {
   profile:{name:'',sex:'male',age:30,height:180,weight:80,targetWeight:null,activity:'light'},
   goal:{adjustment:0,proteinPct:30,carbsPct:40,fatPct:30,addExercise:true,dietStyle:'omnivore',fiberGoal:30,sugarLimit:50,saltLimit:6,satFatLimit:20,preferences:''},
-  days:{},favorites:[],weights:{},
+  days:{},favorites:[],weights:{},ui:{theme:'light'},
 };
 function migrateDays(days){
   const out={};
@@ -386,6 +429,7 @@ function normalizeState(p){
     days:migrateDays(p.days),
     favorites:Array.isArray(p.favorites)?p.favorites:[],
     weights:(p.weights&&typeof p.weights==='object')?p.weights:{},
+    ui:{...DEFAULTS.ui,...(p.ui||{})},
   };
 }
 function load(){ try{const s=localStorage.getItem('essen-artifact');if(s)return normalizeState(JSON.parse(s));}catch(e){} return JSON.parse(JSON.stringify(DEFAULTS)); }
@@ -451,7 +495,7 @@ const MacroBar=({label,value,target,color,unit='g',limit=false})=>{
   return (
     <div className="macro">
       <div className="macro-head"><span className="macro-label">{label}</span>
-        <span className="macro-num">{value}<span className="muted"> {limit?'max.':'/'} {target} {unit}</span>{limit&&over&&<span className="warn-tag"> ⚠</span>}</span></div>
+        <span className="macro-num">{value}<span className="muted"> {limit?'max.':'/'} {target} {unit}</span>{limit&&over&&<span className="warn-tag"><Icon name="warning"/></span>}</span></div>
       <div className="bar"><div className="bar-fill" style={{width:frac*100+'%',background:fill}}/></div>
     </div>
   );
@@ -527,7 +571,7 @@ const Stat=({label,value,sub})=>(<div className="stat"><div className="stat-valu
 const Overlay=({title,onClose,children})=>(
   <div className="overlay" onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
     <div className="overlay-card">
-      <div className="overlay-head"><h2>{title}</h2><button className="chip" onClick={onClose}>✕ Schließen</button></div>
+      <div className="overlay-head"><h2>{title}</h2><button className="chip" onClick={onClose}><Icon name="close"/> Schließen</button></div>
       <div className="overlay-body">{children}</div>
     </div>
   </div>);
@@ -582,7 +626,7 @@ function DayShareOverlay({state,date,onClose}){
       <div className="card">
         <p className="muted small" style={{marginTop:0}}>Kompakte Zusammenfassung dieses Tages – kopieren und in einen Claude-Chat einfügen, um Feedback oder Vorschläge zu bekommen.</p>
         <div className="import-actions">
-          <button className="chip" onClick={copy}>{copied?'✓ Kopiert':'📋 Kopieren'}</button>
+          <button className="chip" onClick={copy}>{copied?<><Icon name="check"/> Kopiert</>:<><Icon name="content_copy"/> Kopieren</>}</button>
         </div>
         <textarea ref={ref} className="import-text" value={text} readOnly rows={15} spellCheck={false} onFocus={e=>e.target.select()}/>
       </div>
@@ -611,9 +655,9 @@ function ImportPanel({state,setState,setDate,onClose}){
   if(done) return (
     <Overlay title="Import abgeschlossen" onClose={onClose}>
       <div className="card">
-        <p className="import-success">✅ {done.added} Einträge auf {done.days} {done.days===1?'Tag':'Tage'} verteilt.</p>
+        <p className="import-success"><Icon name="check_circle"/> {done.added} Einträge auf {done.days} {done.days===1?'Tag':'Tage'} verteilt.</p>
         <p className="muted small">Datum und Mahlzeit wurden automatisch zugeordnet.</p>
-        <div className="import-actions"><button className="primary" onClick={onClose}>Fertig</button><button className="chip" onClick={undo}>↩ Rückgängig</button></div>
+        <div className="import-actions"><button className="primary" onClick={onClose}>Fertig</button><button className="chip" onClick={undo}><Icon name="undo"/> Rückgängig</button></div>
       </div>
     </Overlay>
   );
@@ -632,7 +676,7 @@ function ImportPanel({state,setState,setDate,onClose}){
 
       {result.errors.length>0 && (
         <div className="card import-warn">
-          <h3 className="card-title">⚠ {result.errors.length} Zeile(n) übersprungen</h3>
+          <h3 className="card-title"><Icon name="warning"/> {result.errors.length} Zeile(n) übersprungen</h3>
           <ul className="err-list">
             {result.errors.slice(0,8).map(e=>(<li key={e.line}><strong>Zeile {e.line}:</strong> {e.reason}<div className="muted small ellipsis">{e.text}</div></li>))}
             {result.errors.length>8 && <li className="muted small">… und {result.errors.length-8} weitere</li>}
@@ -646,7 +690,7 @@ function ImportPanel({state,setState,setDate,onClose}){
           <Stat label={byDate.length===1?'Tag':'Tage'} value={byDate.length}/>
           <Stat label="kcal gesamt" value={totals.calories}/>
         </div>
-        {dupCount>0 && <p className="muted small" style={{marginBottom:0}}>⚠ {dupCount} Eintrag/Einträge existieren am Zieltag evtl. schon (gleicher Name, Mahlzeit & kcal).</p>}
+        {dupCount>0 && <p className="muted small" style={{marginBottom:0}}><Icon name="warning"/> {dupCount} Eintrag/Einträge existieren am Zieltag evtl. schon (gleicher Name, Mahlzeit & kcal).</p>}
         </div>
         {byDate.map(([date,rows])=>(
           <div className="card" key={date}>
@@ -746,15 +790,15 @@ function Dashboard({state,setState,date,setDate,openImport}){
   return (
     <div className="page page-dash">
       <header className="datebar">
-        <button className="nav-btn" onClick={()=>setDate(addDays(date,-1))}>‹</button>
+        <button className="nav-btn" aria-label="Vorheriger Tag" onClick={()=>setDate(addDays(date,-1))}><Icon name="chevron_left"/></button>
         {pick
           ? <input type="date" className="date-input" autoFocus value={date} max={todayKey()} onChange={e=>{if(e.target.value)setDate(e.target.value);}} onBlur={()=>setPick(false)}/>
-          : <button className="datebar-label" onClick={()=>setPick(true)} title="Datum wählen">{dateLabel(date)} ▾</button>}
-        <button className="nav-btn" onClick={()=>setDate(addDays(date,1))} disabled={date>=todayKey()}>›</button>
+          : <button className="datebar-label" onClick={()=>setPick(true)} title="Datum wählen">{dateLabel(date)} <Icon name="expand_more"/></button>}
+        <button className="nav-btn" aria-label="Nächster Tag" onClick={()=>setDate(addDays(date,1))} disabled={date>=todayKey()}><Icon name="chevron_right"/></button>
       </header>
       <div className="toolbar">
-        <button className="chip" onClick={()=>setShare(true)}>🤖 Für Claude kopieren</button>
-        <button className="chip" onClick={openImport}>📋 Import</button>
+        <button className="chip" onClick={()=>setShare(true)}><Icon name="smart_toy"/> Für Claude kopieren</button>
+        <button className="chip" onClick={openImport}><Icon name="content_paste"/> Import</button>
       </div>
       <div className="cols">
       <div className="col">
@@ -794,7 +838,7 @@ function Dashboard({state,setState,date,setDate,openImport}){
         <div className="energy-row total"><span>= Tagesbudget</span><strong>{budget} kcal</strong></div>
       </section>
       <section className="card">
-        <h3 className="card-title">⚖️ Gewicht</h3>
+        <h3 className="card-title"><Icon name="monitor_weight"/> Gewicht</h3>
         <div className="weight-row">
           <div className="num-suffix"><input inputMode="decimal" placeholder="–" value={wInput} onChange={e=>setWInput(e.target.value)}
             onBlur={()=>setWeight(setState,date,wInput.trim()===''?null:numDe(wInput))}
@@ -818,16 +862,16 @@ function Today({state,setState,date,setDate,openImport,notify}){
   return (
     <div className="page">
       <header className="datebar">
-        <button className="nav-btn" onClick={()=>setDate(addDays(date,-1))}>‹</button>
+        <button className="nav-btn" aria-label="Vorheriger Tag" onClick={()=>setDate(addDays(date,-1))}><Icon name="chevron_left"/></button>
         {pick
           ? <input type="date" className="date-input" autoFocus value={date} max={todayKey()} onChange={e=>{if(e.target.value)setDate(e.target.value);}} onBlur={()=>setPick(false)}/>
-          : <button className="datebar-label" onClick={()=>setPick(true)} title="Datum wählen">{dateLabel(date)} ▾</button>}
-        <button className="nav-btn" onClick={()=>setDate(addDays(date,1))} disabled={date>=todayKey()}>›</button>
+          : <button className="datebar-label" onClick={()=>setPick(true)} title="Datum wählen">{dateLabel(date)} <Icon name="expand_more"/></button>}
+        <button className="nav-btn" aria-label="Nächster Tag" onClick={()=>setDate(addDays(date,1))} disabled={date>=todayKey()}><Icon name="chevron_right"/></button>
       </header>
       <div className="toolbar">
-        {prevHas && <button className="chip" onClick={()=>{copyDay(setState,prev,date);notify('Mahlzeiten von gestern übernommen');}}>⊕ Gestern übernehmen</button>}
-        <button className="chip" onClick={()=>setShare(true)}>🤖 Für Claude</button>
-        <button className="chip" onClick={()=>window.print()}>🖨️ Drucken</button>
+        {prevHas && <button className="chip" onClick={()=>{copyDay(setState,prev,date);notify('Mahlzeiten von gestern übernommen');}}><Icon name="library_add"/> Gestern übernehmen</button>}
+        <button className="chip" onClick={()=>setShare(true)}><Icon name="smart_toy"/> Für Claude</button>
+        <button className="chip" onClick={()=>window.print()}><Icon name="print"/> Drucken</button>
       </div>
 
       <button className="erfassen-btn" onClick={openImport}>＋ Mahlzeit erfassen</button>
@@ -835,14 +879,14 @@ function Today({state,setState,date,setDate,openImport,notify}){
       <section className="card">
         <div className="section-head"><h3 className="card-title">Mahlzeiten</h3>
           <div className="section-actions">
-            <button className="chip" onClick={()=>{setEditId(null);setOpenF(o=>!o);}}>{openF?'✕':'+ manuell'}</button>
+            <button className="chip" onClick={()=>{setEditId(null);setOpenF(o=>!o);}}>{openF?<Icon name="close"/>:<><Icon name="add"/> manuell</>}</button>
           </div></div>
         {openF && <FoodForm onSubmit={f=>{addFoodTo(setState,date,f);setOpenF(false);notify('Eingetragen: '+f.name);}}/>}
         {day.foods.length===0 && !openF && <p className="empty">Noch nichts erfasst. Tippe auf „＋ Mahlzeit erfassen" (Tabelle einfügen) oder „+ manuell".</p>}
         {MEAL_ORDER.map(meal=>{
           const items=day.foods.filter(f=>f.meal===meal); if(!items.length)return null;
           return (<div className="meal-group" key={meal}>
-            <div className="meal-head"><span className="meal-title">{MEALS[meal].icon} {MEALS[meal].label}</span><span className="meal-kcal">{sumCal(items)} kcal</span></div>
+            <div className="meal-head"><span className="meal-title"><Icon name={MEALS[meal].icon}/> {MEALS[meal].label}</span><span className="meal-kcal">{sumCal(items)} kcal</span></div>
             <ul className="entries">{items.map(f=> editId===f.id
               ? (<li key={f.id}><FoodForm initial={f} submitLabel="Speichern" onSubmit={data=>{updateFood(setState,date,f.id,data);setEditId(null);}}/></li>)
               : (
@@ -853,8 +897,8 @@ function Today({state,setState,date,setDate,openImport,notify}){
                   {f.note&&<span className="entry-note">{f.note}</span>}</div>
                 <div className="entry-kcal">{Math.round(f.calories)}</div>
                 <div className="entry-actions">
-                  <button className="icon-btn" title="Bearbeiten" onClick={()=>{setOpenF(false);setEditId(f.id);}}>✎</button>
-                  <button className="del" title="Löschen" onClick={()=>rmFood(f.id)}>×</button>
+                  <button className="icon-btn" title="Bearbeiten" onClick={()=>{setOpenF(false);setEditId(f.id);}}><Icon name="edit"/></button>
+                  <button className="del" title="Löschen" onClick={()=>rmFood(f.id)}><Icon name="close"/></button>
                 </div>
               </li>))}</ul>
           </div>);
@@ -863,7 +907,7 @@ function Today({state,setState,date,setDate,openImport,notify}){
 
       <section className="card">
         <div className="section-head"><h3 className="card-title">Sport</h3>
-          <div className="section-actions"><button className="chip" onClick={()=>setOpenE(o=>!o)}>{openE?'✕':'+ erfassen'}</button></div></div>
+          <div className="section-actions"><button className="chip" onClick={()=>setOpenE(o=>!o)}>{openE?<Icon name="close"/>:<><Icon name="add"/> erfassen</>}</button></div></div>
         {openE && <ExerciseForm onSubmit={e=>{addExTo(setState,date,e);setOpenE(false);}}/>}
         {day.exercises.length===0 && !openE && <p className="empty">Noch kein Sport erfasst.</p>}
         <ul className="entries">{day.exercises.map(e=>(
@@ -871,7 +915,7 @@ function Today({state,setState,date,setDate,openImport,notify}){
             <div className="entry-main"><span className="entry-name">{e.name}</span>
               <span className="entry-macros">{e.durationMin?e.durationMin+' min · ':''}{timeLabel(e.time)}</span></div>
             <div className="entry-kcal burn">−{Math.round(e.calories)}</div>
-            <button className="del" onClick={()=>rmEx(e.id)}>×</button>
+            <button className="del" onClick={()=>rmEx(e.id)}><Icon name="close"/></button>
           </li>))}</ul>
       </section>
       {share && <DayShareOverlay state={state} date={date} onClose={()=>setShare(false)}/>}
@@ -946,14 +990,14 @@ function Stats({state,setDate,goToToday}){
         <Stat label="Ø Abweichung" value={(avgDev>0?'+':'')+avgDev} sub="kcal/Tag"/>
         <Stat label="Im Budget" value={withinBudget+' / '+(tracked.length||0)}/>
         <Stat label="Erfasste Tage" value={tracked.length+' / '+range}/>
-        <Stat label="🔥 Serie" value={streak} sub={streak===1?'Tag':'Tage'}/>
+        <Stat label={<><Icon name="local_fire_department"/> Serie</>} value={streak} sub={streak===1?'Tag':'Tage'}/>
       </div>
 
       {tracked.length===0 && <p className="empty">Noch keine Daten im Zeitraum. Importiere oder erfasse Mahlzeiten.</p>}
 
       <section className="card">
         <div className="section-head"><h3 className="card-title">Zeitverlauf</h3>
-          {tracked.length>0 && <div className="kpi"><span className="kpi-big" style={{color:METRIC_COLOR[metric]}}>{mAvg}</span><span className="kpi-unit">{mInfo.unit.trim()} Ø</span>{present.length>=4 && <span className={'trend '+(trend>0?'up':trend<0?'down':'flat')}>{trend>0?'↑ steigend':trend<0?'↓ fallend':'→ stabil'}</span>}</div>}
+          {tracked.length>0 && <div className="kpi"><span className="kpi-big" style={{color:METRIC_COLOR[metric]}}>{mAvg}</span><span className="kpi-unit">{mInfo.unit.trim()} Ø</span>{present.length>=4 && <span className={'trend '+(trend>0?'up':trend<0?'down':'flat')}>{trend>0?<><Icon name="trending_up"/> steigend</>:trend<0?<><Icon name="trending_down"/> fallend</>:<><Icon name="trending_flat"/> stabil</>}</span>}</div>}
         </div>
         <div className="metric-chips">{METRICS.map(m=>(<button key={m.id} className={'metric-chip'+(metric===m.id?' on':'')} onClick={()=>setMetric(m.id)}>{m.label}</button>))}</div>
         <DayBars data={chartData} unit={mInfo.unit} color={METRIC_COLOR[metric]} avg={avgLine}/>
@@ -961,7 +1005,7 @@ function Stats({state,setDate,goToToday}){
       </section>
 
       <section className="card">
-        <h3 className="card-title">🔮 Prognose</h3>
+        <h3 className="card-title"><Icon name="auto_graph"/> Prognose</h3>
         {!enoughForProg
           ? <p className="empty">Noch zu wenig erfasste Tage ({tracked.length}) – ab ca. 3 Tagen gibt es eine Schätzung.</p>
           : (<>
@@ -981,17 +1025,17 @@ function Stats({state,setDate,goToToday}){
       {wPresent.length>0
         ? (<div className="grid2">
             <section className="card">
-              <h3 className="card-title">⚖️ Gewichtsverlauf</h3>
+              <h3 className="card-title"><Icon name="monitor_weight"/> Gewichtsverlauf</h3>
               <LineChart points={wpts} target={profile.targetWeight}/>
               <div className="avg-row" style={{marginTop:8}}><span>Aktuell{wChange!=null&&<span className="muted small"> {wChange>0?'+':''}{wChange} kg im Zeitraum</span>}</span><strong>{wPresent[wPresent.length-1].value} kg</strong></div>
             </section>
             <section className="card">
-              <h3 className="card-title">📅 Kalender</h3>
+              <h3 className="card-title"><Icon name="calendar_month"/> Kalender</h3>
               <Heatmap days={days} profile={profile} goal={goal} onPick={k=>{setDate(k);goToToday();}}/>
             </section>
           </div>)
         : (<section className="card">
-            <h3 className="card-title">📅 Kalender</h3>
+            <h3 className="card-title"><Icon name="calendar_month"/> Kalender</h3>
             <Heatmap days={days} profile={profile} goal={goal} onPick={k=>{setDate(k);goToToday();}}/>
           </section>)}
 
@@ -1039,10 +1083,10 @@ function ArchiveSection({state,setState,goDay}){
   const del=date=>{if(confirm('Tag '+dateLabel(date)+' wirklich aus dem Archiv löschen?'))setState(s=>{const ds={...s.days};delete ds[date];return{...s,days:ds};});};
   return (
     <section className="card">
-      <div className="section-head"><h3 className="card-title">🗄️ Archiv{totalDays?(' · '+totalDays+(totalDays===1?' Tag':' Tage')):''}</h3>
-        <div className="section-actions">{totalEntries>0 && <button className="chip" onClick={()=>setShowExport(true)}>⬇ Export</button>}</div></div>
+      <div className="section-head"><h3 className="card-title"><Icon name="inventory_2"/> Archiv{totalDays?(' · '+totalDays+(totalDays===1?' Tag':' Tage')):''}</h3>
+        <div className="section-actions">{totalEntries>0 && <button className="chip" onClick={()=>setShowExport(true)}><Icon name="download"/> Export</button>}</div></div>
       {totalDays===0 && <p className="empty" style={{margin:0}}>Noch keine Tage. Importiere deine Tabelle oder erfasse Mahlzeiten.</p>}
-      {totalDays>0 && <input placeholder="🔎 Lebensmittel suchen…" value={q} onChange={e=>setQ(e.target.value)}/>}
+      {totalDays>0 && <input placeholder="Lebensmittel suchen…" value={q} onChange={e=>setQ(e.target.value)}/>}
       {ql && filtered.length===0 && <p className="empty">Keine Treffer für „{q}".</p>}
       {totalDays>0 && (
         <div className="arch-scroll" style={{marginTop:10}}>
@@ -1056,7 +1100,7 @@ function ArchiveSection({state,setState,goDay}){
                     <div className="archive-meta"><span className="muted small">E {d.totals.protein} · KH {d.totals.carbs} · F {d.totals.fat} g · {d.foods.length} Einträge</span></div>
                     <div className={'archive-kcal'+(d.over?' over':'')}>{d.totals.calories}<span className="muted small"> / {d.budget}</span></div>
                   </button>
-                  <button className="del" onClick={()=>del(d.date)}>×</button>
+                  <button className="del" onClick={()=>del(d.date)}><Icon name="close"/></button>
                 </li>))}</ul>
             </div>
           ))}
@@ -1081,8 +1125,8 @@ function ExportOverlay({days,onClose}){
       <div className="card">
         <p className="muted small" style={{marginTop:0}}>Alle Einträge im selben Format wie der Import – kann gesichert oder wieder eingespielt werden.</p>
         <div className="import-actions">
-          <button className="chip" onClick={copy}>{copied?'✓ Kopiert':'📋 Kopieren'}</button>
-          <button className="chip" onClick={download}>⬇ Als Datei</button>
+          <button className="chip" onClick={copy}>{copied?<><Icon name="check"/> Kopiert</>:<><Icon name="content_copy"/> Kopieren</>}</button>
+          <button className="chip" onClick={download}><Icon name="download"/> Als Datei</button>
         </div>
         <textarea className="import-text" value={tsv} readOnly rows={12} spellCheck={false}/>
       </div>
@@ -1148,7 +1192,7 @@ function Profile({state,setState,notify,setDate,goToDash}){
 
       <section className="card">
         <h3 className="card-title">Makro-Verteilung</h3>
-        <p className={'muted small'} style={{color:macroSum!==100?'var(--protein)':'var(--muted)'}}>Summe: {macroSum}% {macroSum!==100?'(sollte 100% sein)':'✓'}</p>
+        <p className={'muted small'} style={{color:macroSum!==100?'var(--protein)':'var(--muted)'}}>Summe: {macroSum}% {macroSum!==100?'(sollte 100% sein)':<Icon name="check"/>}</p>
         {[['proteinPct','Eiweiß','var(--protein)',tgt.protein],['carbsPct','Kohlenhydrate','var(--carbs)',tgt.carbs],['fatPct','Fett','var(--fat)',tgt.fat]].map(([k,l,c,g])=>(
           <div className="pct" key={k}>
             <div className="pct-head"><span style={{color:c}}>● {l}</span><span className="muted">{goal[k]}% · {g} g</span></div>
@@ -1175,22 +1219,22 @@ function Profile({state,setState,notify,setDate,goToDash}){
       <ArchiveSection state={state} setState={setState} goDay={d=>{setDate(d);goToDash();}}/>
 
       <section className="card">
-        <h3 className="card-title">💾 Daten &amp; Sicherung</h3>
+        <h3 className="card-title"><Icon name="save"/> Daten &amp; Sicherung</h3>
         <p className="muted small" style={{marginTop:0}}>Alle Daten liegen nur in diesem Browser. Lade regelmäßig ein Backup herunter, damit nichts verloren geht.</p>
         <div className="import-actions">
-          <button className="chip" onClick={backup}>⬇ Backup (JSON)</button>
-          <button className="chip" onClick={()=>fileRef.current&&fileRef.current.click()}>↥ Wiederherstellen</button>
+          <button className="chip" onClick={backup}><Icon name="download"/> Backup (JSON)</button>
+          <button className="chip" onClick={()=>fileRef.current&&fileRef.current.click()}><Icon name="upload"/> Wiederherstellen</button>
           <input ref={fileRef} type="file" accept="application/json,.json" style={{display:'none'}} onChange={onFile}/>
         </div>
       </section>
 
-      <p className="footer-note">Daten bleiben lokal in diesem Browser (offline-fähig). Erfassung per „📋 Import“ (Copy &amp; Paste) oder „+ manuell“.</p>
+      <p className="footer-note">Daten bleiben lokal in diesem Browser (offline-fähig). Erfassung per „Import“ (Copy &amp; Paste) oder „+ manuell“.</p>
     </div>
   );
 }
 
 /* ---------- App ---------- */
-const TABS=[{id:'dashboard',label:'Dashboard',icon:'🏠'},{id:'today',label:'Heute',icon:'🍽️'},{id:'stats',label:'Analyse',icon:'📊'},{id:'profile',label:'Profil',icon:'⚙️'}];
+const TABS=[{id:'dashboard',label:'Dashboard',icon:'space_dashboard'},{id:'today',label:'Heute',icon:'restaurant'},{id:'stats',label:'Analyse',icon:'insights'},{id:'profile',label:'Profil',icon:'settings'}];
 function App(){
   const [state,setState]=useState(load);
   const [tab,setTab]=useState('dashboard');
@@ -1199,6 +1243,14 @@ function App(){
   const [toast,setToast]=useState(null);
   useEffect(()=>{save(state);},[state]);
   const notify=msg=>{setToast(msg);clearTimeout(notify._t);notify._t=setTimeout(()=>setToast(null),1900);};
+
+  const theme=(state.ui&&state.ui.theme==='dark')?'dark':'light';
+  useEffect(()=>{
+    const el=document.documentElement;
+    if(theme==='dark')el.setAttribute('data-theme','dark');else el.removeAttribute('data-theme');
+    const mc=document.querySelector('meta[name="theme-color"]');if(mc)mc.setAttribute('content',theme==='dark'?'#131316':'#f6f3ef');
+  },[theme]);
+  const toggleTheme=()=>setState(s=>({...s,ui:{...s.ui,theme:(s.ui&&s.ui.theme==='dark')?'light':'dark'}}));
 
   const dateRef=useRef(date); dateRef.current=date;
   const tabRef=useRef(tab); tabRef.current=tab;
@@ -1227,10 +1279,13 @@ function App(){
         {tab==='profile' && <Profile state={state} setState={setState} notify={notify} setDate={setDate} goToDash={()=>setTab('dashboard')}/>}
       </main>
       <nav className="tabbar">
-        <div className="brand"><span className="brand-icon">🍊</span><span className="brand-name">Essen</span></div>
+        <div className="brand"><span className="brand-icon"><Icon name="nutrition"/></span><span className="brand-name">Essen</span></div>
         {TABS.map(t=>(
         <button key={t.id} className={'tab'+(tab===t.id?' active':'')} onClick={()=>setTab(t.id)}>
-          <span className="tab-icon">{t.icon}</span><span className="tab-label">{t.label}</span></button>))}
+          <span className="tab-icon"><Icon name={t.icon}/></span><span className="tab-label">{t.label}</span></button>))}
+        <button className="tab theme-toggle" onClick={toggleTheme} title="Hell/Dunkel umschalten" aria-label="Design umschalten">
+          <span className="tab-icon"><Icon name={theme==='dark'?'light_mode':'dark_mode'}/></span>
+          <span className="tab-label">{theme==='dark'?'Hell':'Dunkel'}</span></button>
       </nav>
       {importOpen && <ImportPanel state={state} setState={setState} setDate={setDate} onClose={()=>setImportOpen(false)}/>}
       {toast && <div className="toast">{toast}</div>}
