@@ -399,9 +399,6 @@ function setWeight(setState,date,kg){
     const keys=Object.keys(weights).sort();const latest=keys.length?weights[keys[keys.length-1]]:s.profile.weight;
     return {...s,weights,profile:{...s.profile,weight:latest}};});
 }
-const favFrom = f => ({name:f.name,meal:f.meal,quantity:f.quantity,calories:f.calories,protein:f.protein,carbs:f.carbs,sugar:f.sugar,fat:f.fat,saturatedFat:f.saturatedFat,fiber:f.fiber,salt:f.salt,note:f.note});
-function addFavorite(setState,fav){setState(s=>{if(s.favorites.some(x=>x.name===fav.name&&(x.quantity||'')===(fav.quantity||'')))return s;return {...s,favorites:[...s.favorites,{...fav,id:uid()}]};});}
-function removeFavorite(setState,id){setState(s=>({...s,favorites:s.favorites.filter(f=>f.id!==id)}));}
 
 /* ---------- UI-Bausteine ---------- */
 function Ring({consumed,budget}){
@@ -707,39 +704,8 @@ function ExerciseForm({onSubmit}){
     </form>
   );
 }
-function QuickPaste({setState,setDate,notify,onClose}){
-  const [text,setText]=useState('');
-  const res=useMemo(()=>parseStructured(text),[text]);
-  function go(){if(!res.rows.length)return;importEntries(setState,res.rows,false);const first=[...new Set(res.rows.map(r=>r.date))].sort()[0];if(first)setDate(first);notify(res.rows.length+' Einträge übernommen');setText('');onClose();}
-  return (
-    <div className="form">
-      <textarea className="import-text" placeholder="Tabelle einfügen (Datum ⇥ Mahlzeit ⇥ …) – wird direkt übernommen" value={text} onChange={e=>setText(e.target.value)} rows={4} spellCheck={false}/>
-      <div className="import-actions">
-        <span className="muted small" style={{alignSelf:'center'}}>{res.rows.length} erkannt{res.errors.length?(' · '+res.errors.length+' Fehler'):''}</span>
-        <button className="chip" onClick={()=>setText(IMPORT_EXAMPLE)}>Beispiel</button>
-        <button className="primary" style={{flex:1}} disabled={!res.rows.length} onClick={go}>Übernehmen</button>
-      </div>
-    </div>
-  );
-}
-function FavPanel({state,setState,date,notify,onClose}){
-  const favs=state.favorites;
-  return (
-    <div style={{margin:'4px 0 8px'}}>
-      {favs.length===0 && <p className="empty">Noch keine Favoriten. Tippe bei einem Eintrag auf ⭐, um ihn zu speichern.</p>}
-      <div className="fav-list">{favs.map(f=>(
-        <div className="fav-item" key={f.id}>
-          <button className="fav-add" onClick={()=>{addFoodTo(setState,date,{...favFrom(f),source:'manual'});notify(f.name+' hinzugefügt');}}>
-            <span className="fav-name">{MEALS[f.meal].icon} {f.name}{f.quantity&&<span className="fav-sub"> · {f.quantity}</span>}</span>
-            <span className="fav-sub">{Math.round(f.calories)} kcal</span>
-          </button>
-          <button className="del" title="Favorit löschen" onClick={()=>removeFavorite(setState,f.id)}>×</button>
-        </div>))}</div>
-    </div>
-  );
-}
 
-function Dashboard({state,setState,date,setDate}){
+function Dashboard({state,setState,date,setDate,openImport}){
   const {profile,goal}=state;
   const day=state.days[date]||{date,foods:[],exercises:[]};
   const totals=sumNut(day.foods), consumed=totals.calories;
@@ -760,6 +726,7 @@ function Dashboard({state,setState,date,setDate}){
       </header>
       <div className="toolbar">
         <button className="chip" onClick={()=>setShare(true)}>🤖 Für Claude kopieren</button>
+        <button className="chip" onClick={openImport}>📋 Import</button>
       </div>
       <div className="cols">
       <div className="col">
@@ -816,11 +783,10 @@ function Dashboard({state,setState,date,setDate}){
 
 function Today({state,setState,date,setDate,openImport,notify}){
   const day=state.days[date]||{date,foods:[],exercises:[]};
-  const [openF,setOpenF]=useState(false),[openE,setOpenE]=useState(false),[openFav,setOpenFav]=useState(false),[openPaste,setOpenPaste]=useState(false),[editId,setEditId]=useState(null),[pick,setPick]=useState(false),[share,setShare]=useState(false);
+  const [openF,setOpenF]=useState(false),[openE,setOpenE]=useState(false),[editId,setEditId]=useState(null),[pick,setPick]=useState(false),[share,setShare]=useState(false);
   const rmFood=id=>setState(s=>{const d=s.days[date];if(!d)return s;return{...s,days:{...s.days,[date]:{...d,foods:d.foods.filter(x=>x.id!==id)}}};});
   const rmEx=id=>setState(s=>{const d=s.days[date];if(!d)return s;return{...s,days:{...s.days,[date]:{...d,exercises:d.exercises.filter(x=>x.id!==id)}}};});
   const prev=addDays(date,-1); const prevHas=(state.days[prev]&&state.days[prev].foods.length)>0;
-  function toggleErfassen(){setOpenPaste(false);setOpenFav(false);setEditId(null);setOpenF(o=>!o);}
   return (
     <div className="page">
       <header className="datebar">
@@ -836,19 +802,15 @@ function Today({state,setState,date,setDate,openImport,notify}){
         <button className="chip" onClick={()=>window.print()}>🖨️ Drucken</button>
       </div>
 
-      <button className="erfassen-btn" onClick={toggleErfassen}>{openF?'✕ Abbrechen':'＋ Mahlzeit erfassen'}</button>
-      {openF && <section className="card"><FoodForm onSubmit={f=>{addFoodTo(setState,date,f);setOpenF(false);notify('Eingetragen: '+f.name);}}/></section>}
+      <button className="erfassen-btn" onClick={openImport}>＋ Mahlzeit erfassen</button>
 
       <section className="card">
         <div className="section-head"><h3 className="card-title">Mahlzeiten</h3>
           <div className="section-actions">
-            <button className="chip" onClick={openImport}>📋 Import</button>
-            <button className="chip" onClick={()=>{setOpenF(false);setOpenFav(false);setOpenPaste(o=>!o);}}>{openPaste?'✕':'⚡ Einfügen'}</button>
-            <button className="chip" onClick={()=>{setOpenF(false);setOpenPaste(false);setOpenFav(o=>!o);}}>{openFav?'✕':'⭐ Favoriten'}</button>
+            <button className="chip" onClick={()=>{setEditId(null);setOpenF(o=>!o);}}>{openF?'✕':'+ manuell'}</button>
           </div></div>
-        {openPaste && <QuickPaste setState={setState} setDate={setDate} notify={notify} onClose={()=>setOpenPaste(false)}/>}
-        {openFav && <FavPanel state={state} setState={setState} date={date} notify={notify} onClose={()=>setOpenFav(false)}/>}
-        {day.foods.length===0 && !openPaste && !openFav && <p className="empty">Noch nichts erfasst. Tippe oben auf „＋ Mahlzeit erfassen" – oder „📋 Import" / „⚡ Einfügen".</p>}
+        {openF && <FoodForm onSubmit={f=>{addFoodTo(setState,date,f);setOpenF(false);notify('Eingetragen: '+f.name);}}/>}
+        {day.foods.length===0 && !openF && <p className="empty">Noch nichts erfasst. Tippe auf „＋ Mahlzeit erfassen" (Tabelle einfügen) oder „+ manuell".</p>}
         {MEAL_ORDER.map(meal=>{
           const items=day.foods.filter(f=>f.meal===meal); if(!items.length)return null;
           return (<div className="meal-group" key={meal}>
@@ -863,7 +825,6 @@ function Today({state,setState,date,setDate,openImport,notify}){
                   {f.note&&<span className="entry-note">{f.note}</span>}</div>
                 <div className="entry-kcal">{Math.round(f.calories)}</div>
                 <div className="entry-actions">
-                  <button className="icon-btn" title="Als Favorit speichern" onClick={()=>{addFavorite(setState,favFrom(f));notify('Als Favorit gespeichert ⭐');}}>⭐</button>
                   <button className="icon-btn" title="Bearbeiten" onClick={()=>{setOpenF(false);setEditId(f.id);}}>✎</button>
                   <button className="del" title="Löschen" onClick={()=>rmFood(f.id)}>×</button>
                 </div>
@@ -1090,7 +1051,7 @@ function ExportOverlay({days,onClose}){
 /* ---------- Profil ---------- */
 const PRESETS=[{mode:'lose',label:'Abnehmen (−500)',adj:-500},{mode:'lose',label:'Leicht abnehmen (−300)',adj:-300},{mode:'maintain',label:'Halten (±0)',adj:0},{mode:'gain',label:'Aufbauen (+300)',adj:300},{mode:'gain',label:'Aufbauen (+500)',adj:500}];
 function Profile({state,setState,notify}){
-  const {profile,goal,favorites}=state;
+  const {profile,goal}=state;
   const fileRef=useRef(null);
   const setP=p=>setState(s=>({...s,profile:{...s.profile,...p}}));
   const setG=g=>setState(s=>({...s,goal:{...s.goal,...g}}));
@@ -1170,16 +1131,6 @@ function Profile({state,setState,notify}){
       </section>
 
       <section className="card">
-        <h3 className="card-title">⭐ Favoriten ({favorites.length})</h3>
-        {favorites.length===0 && <p className="empty">Noch keine. Tippe unter „Heute" bei einem Eintrag auf ⭐.</p>}
-        <div className="fav-list">{favorites.map(f=>(
-          <div className="fav-item" key={f.id}>
-            <div className="fav-add" style={{cursor:'default'}}><span className="fav-name">{MEALS[f.meal].icon} {f.name}{f.quantity&&<span className="fav-sub"> · {f.quantity}</span>}</span><span className="fav-sub">{Math.round(f.calories)} kcal</span></div>
-            <button className="del" onClick={()=>removeFavorite(setState,f.id)}>×</button>
-          </div>))}</div>
-      </section>
-
-      <section className="card">
         <h3 className="card-title">💾 Daten &amp; Sicherung</h3>
         <p className="muted small" style={{marginTop:0}}>Alle Daten liegen nur in diesem Browser. Lade regelmäßig ein Backup herunter, damit nichts verloren geht.</p>
         <div className="import-actions">
@@ -1226,7 +1177,7 @@ function App(){
   return (
     <div className="app">
       <main className="content">
-        {tab==='dashboard' && <Dashboard state={state} setState={setState} date={date} setDate={setDate}/>}
+        {tab==='dashboard' && <Dashboard state={state} setState={setState} date={date} setDate={setDate} openImport={()=>setImportOpen(true)}/>}
         {tab==='today' && <Today state={state} setState={setState} date={date} setDate={setDate} openImport={()=>setImportOpen(true)} notify={notify}/>}
         {tab==='stats' && <Stats state={state} setDate={setDate} goToToday={()=>setTab('today')}/>}
         {tab==='archive' && <Archive state={state} setState={setState} setDate={setDate} goToToday={()=>setTab('today')} openImport={()=>setImportOpen(true)}/>}
