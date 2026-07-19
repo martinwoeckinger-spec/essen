@@ -45,12 +45,11 @@ Workflow nötig.
 - **„Gestern übernehmen"** – den Vortag in einen Tag kopieren.
 - **Erweiterte Nährwerte** – kcal, Eiweiß/KH/Fett **plus** Zucker, gesättigte
   Fettsäuren, Ballaststoffe und Salz, mit Ziel-/Limit-Balken und Makro-Donut.
-- **Gewicht** – pro Tag erfassen; Verlaufskurve und Bezug zum Wunschgewicht.
 - **Archiv** – alle Tage nach Monat, durchsuchbar; Export zurück ins Tab-Format.
 - **Analyse** – umschaltbarer **Zeitverlauf** (Kalorien/Makros/Ballaststoffe/
-  Zucker/Salz) mit 7-Tage-Schnitt, **Kalender-Heatmap**, **Gewichtsverlauf**,
-  **Kalorienbilanz** (geschätzte kg-Veränderung), Verteilung nach Mahlzeit und
-  Tracking-Treue (Budget-Treue, Serie).
+  Zucker/Salz) mit 7-Tage-Schnitt, **Kalender-Heatmap**, **Prognose**
+  (geschätzte kg-Veränderung aus der Kalorienbilanz), Verteilung nach Mahlzeit
+  und Tracking-Treue (Budget-Treue, Serie).
 - **Profil & Wünsche** – Körperdaten, Wunschgewicht inkl. Tempo-/Dauerschätzung,
   Ernährungsstil, Makro-Verteilung, Nährwert-Ziele/-Limits und persönliche
   Hinweise.
