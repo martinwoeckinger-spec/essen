@@ -166,10 +166,16 @@ html,body,#root{height:100%;margin:0}
   .entry-kcal.burn{ color:var(--accent2); }
   .entry-actions{ @apply flex items-center; gap:2px; }
   .meal-group{ margin-top:12px; }
-  .meal-head{ @apply flex justify-between items-center; padding-top:10px;border-top:1px solid var(--line); }
+  .meal-head{ @apply flex justify-between items-center gap-2 w-full bg-transparent border-0 text-onsurf cursor-pointer rounded-lg transition-colors; text-align:left;padding:10px 4px 8px;margin:0 -4px;border-top:1px solid var(--line);border-radius:0; }
+  .meal-head:hover{ @apply text-primary; }
+  .meal-head:hover .meal-chevron{ color:var(--accent); }
   .meal-title{ @apply flex items-center gap-2; font-size:14px;font-weight:700; }
   .meal-title .msym{ font-size:19px;color:var(--accent); }
+  .meal-count{ @apply inline-flex items-center justify-center bg-s3 text-onvar rounded-full; min-width:20px;height:18px;font-size:11px;font-weight:700;padding:0 6px;margin-left:2px; }
+  .meal-head-right{ @apply flex items-center gap-1.5; }
   .meal-kcal{ @apply text-onvar; font-size:13px;font-variant-numeric:tabular-nums; }
+  .meal-chevron{ @apply text-faint transition-transform; font-size:20px; }
+  .meal-group.collapsed .meal-chevron{ transform:rotate(-90deg); }
   .lede{ @apply text-onvar; font-size:13px;margin:0 0 12px;line-height:1.5; }
   .kpi{ @apply flex items-baseline gap-2; }
   .kpi-big{ font-weight:800;font-size:30px;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1; }
@@ -411,7 +417,7 @@ const IMPORT_EXAMPLE=[
 const DEFAULTS = {
   profile:{name:'',sex:'male',age:30,height:180,weight:80,targetWeight:null,activity:'light'},
   goal:{adjustment:0,proteinPct:30,carbsPct:40,fatPct:30,addExercise:true,dietStyle:'omnivore',fiberGoal:30,sugarLimit:50,saltLimit:6,satFatLimit:20,preferences:''},
-  days:{},favorites:[],weights:{},ui:{theme:'light'},
+  days:{},favorites:[],weights:{},ui:{theme:'light',collapsedMeals:{}},
 };
 function migrateDays(days){
   const out={};
@@ -858,6 +864,8 @@ function Today({state,setState,date,setDate,openImport,notify}){
   const [openF,setOpenF]=useState(false),[openE,setOpenE]=useState(false),[editId,setEditId]=useState(null),[pick,setPick]=useState(false),[share,setShare]=useState(false);
   const rmFood=id=>setState(s=>{const d=s.days[date];if(!d)return s;return{...s,days:{...s.days,[date]:{...d,foods:d.foods.filter(x=>x.id!==id)}}};});
   const rmEx=id=>setState(s=>{const d=s.days[date];if(!d)return s;return{...s,days:{...s.days,[date]:{...d,exercises:d.exercises.filter(x=>x.id!==id)}}};});
+  const collapsedMeals=(state.ui&&state.ui.collapsedMeals)||{};
+  const toggleMeal=m=>setState(s=>{const cm={...((s.ui&&s.ui.collapsedMeals)||{})};cm[m]=!cm[m];return{...s,ui:{...s.ui,collapsedMeals:cm}};});
   const prev=addDays(date,-1); const prevHas=(state.days[prev]&&state.days[prev].foods.length)>0;
   return (
     <div className="page">
@@ -874,7 +882,7 @@ function Today({state,setState,date,setDate,openImport,notify}){
         <button className="chip" onClick={()=>window.print()}><Icon name="print"/> Drucken</button>
       </div>
 
-      <button className="erfassen-btn" onClick={openImport}>＋ Mahlzeit erfassen</button>
+      <button className="erfassen-btn" onClick={openImport}><Icon name="add"/> Mahlzeit erfassen</button>
 
       <section className="card">
         <div className="section-head"><h3 className="card-title">Mahlzeiten</h3>
@@ -885,9 +893,12 @@ function Today({state,setState,date,setDate,openImport,notify}){
         {day.foods.length===0 && !openF && <p className="empty">Noch nichts erfasst. Tippe auf „＋ Mahlzeit erfassen" (Tabelle einfügen) oder „+ manuell".</p>}
         {MEAL_ORDER.map(meal=>{
           const items=day.foods.filter(f=>f.meal===meal); if(!items.length)return null;
-          return (<div className="meal-group" key={meal}>
-            <div className="meal-head"><span className="meal-title"><Icon name={MEALS[meal].icon}/> {MEALS[meal].label}</span><span className="meal-kcal">{sumCal(items)} kcal</span></div>
-            <ul className="entries">{items.map(f=> editId===f.id
+          const isColl=!!collapsedMeals[meal];
+          return (<div className={'meal-group'+(isColl?' collapsed':'')} key={meal}>
+            <button className="meal-head" onClick={()=>toggleMeal(meal)} aria-expanded={!isColl}>
+              <span className="meal-title"><Icon name={MEALS[meal].icon}/> {MEALS[meal].label}{isColl&&<span className="meal-count">{items.length}</span>}</span>
+              <span className="meal-head-right"><span className="meal-kcal">{sumCal(items)} kcal</span><Icon name="expand_more" className="meal-chevron"/></span></button>
+            {!isColl && <ul className="entries">{items.map(f=> editId===f.id
               ? (<li key={f.id}><FoodForm initial={f} submitLabel="Speichern" onSubmit={data=>{updateFood(setState,date,f.id,data);setEditId(null);}}/></li>)
               : (
               <li className="entry" key={f.id}>
@@ -900,7 +911,7 @@ function Today({state,setState,date,setDate,openImport,notify}){
                   <button className="icon-btn" title="Bearbeiten" onClick={()=>{setOpenF(false);setEditId(f.id);}}><Icon name="edit"/></button>
                   <button className="del" title="Löschen" onClick={()=>rmFood(f.id)}><Icon name="close"/></button>
                 </div>
-              </li>))}</ul>
+              </li>))}</ul>}
           </div>);
         })}
       </section>
