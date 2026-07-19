@@ -224,19 +224,38 @@ html,body,#root{height:100%;margin:0}
 .donut-wrap{position:relative;display:flex;align-items:center;justify-content:center}
 .donut-center{position:absolute;text-align:center;line-height:1.1}
 .donut-center b{font-size:20px}.donut-center .muted{font-size:11px}
-.chart{position:relative;display:flex;align-items:flex-end;gap:4px;height:160px;padding-top:8px;overflow:hidden}
-.chart-col{flex:1;display:flex;flex-direction:column;align-items:center;height:100%}
-.chart-bar-wrap{position:relative;flex:1;width:100%;display:flex;align-items:flex-end;justify-content:center}
-.chart-bar{width:70%;background:var(--data);border-radius:6px 6px 0 0;min-height:2px;transition:height .4s cubic-bezier(.2,.8,.2,1)}
-.chart-bar.over{background:var(--danger)}
-.budget-line{position:absolute;left:0;right:0;height:2px;background:var(--muted);opacity:.55}
-.chart-label{font-size:10px;color:var(--muted);margin-top:4px}
-.chart-avg{position:absolute;left:0;right:0;top:8px;bottom:20px;pointer-events:none;width:100%;height:auto}
+/* --- Balken-Zeitverlauf --- */
+.bchart{display:flex;align-items:flex-start;gap:9px}
+.bchart-yaxis{display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end;height:180px;min-width:24px;font-size:10px;font-weight:600;color:var(--faint);font-variant-numeric:tabular-nums}
+.bchart-main{flex:1;min-width:0}
+.bchart-plot{position:relative;height:180px}
+.bchart-grid{position:absolute;inset:0;pointer-events:none}
+.bchart-grid i{position:absolute;left:0;right:0;height:1px;background:var(--line)}
+.bchart-ref{position:absolute;left:0;right:0;border-top:2px dashed var(--accent);opacity:.85;pointer-events:none}
+.bchart-ref span{position:absolute;right:0;top:-9px;font-size:10px;font-weight:700;color:var(--accent);background:var(--card);padding:0 5px;border-radius:6px;white-space:nowrap}
+.bchart-bars{position:absolute;inset:0;display:flex;align-items:flex-end}
+.bchart-col{flex:1;display:flex;align-items:flex-end;justify-content:center;height:100%;min-width:0}
+.bchart-bar{width:62%;max-width:26px;background:var(--data);border-radius:5px 5px 2px 2px;min-height:2px;transition:height .45s cubic-bezier(.2,.8,.2,1)}
+.bchart-bar.over{background:var(--danger)}
+.bchart-avg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.bchart-xaxis{display:flex;margin-top:7px}
+.bchart-xaxis span{flex:1;text-align:center;font-size:10px;color:var(--muted);min-width:0;overflow:hidden;white-space:nowrap;font-variant-numeric:tabular-nums}
+/* --- Linien-Verlauf (Gewicht) --- */
+.lc-plot{position:relative;height:180px}
+.lc-svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.lc-dot{position:absolute;width:9px;height:9px;border-radius:50%;background:var(--accent);border:2px solid var(--card);transform:translate(-50%,-50%);box-shadow:0 0 0 1.5px var(--accent);z-index:1}
+.lc-xaxis{display:flex;justify-content:space-between;margin-top:7px;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.weight-row{display:flex;align-items:center;gap:12px}
+.weight-row .num-suffix{flex:1}
+.mini-spark{width:100%;display:block;margin-top:14px}
+.weight-trend-row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px}
+.wtrend{display:inline-flex;align-items:center;gap:3px;font-weight:700;font-size:13px;font-variant-numeric:tabular-nums}
+.wtrend .msym{font-size:17px}
+.wtrend.good{color:var(--good)}.wtrend.bad{color:var(--danger)}.wtrend.flat{color:var(--muted)}
 .chart-legend{display:flex;gap:14px;justify-content:center;margin-top:12px;font-size:12px;color:var(--muted);flex-wrap:wrap}
 .chart-legend span{display:flex;align-items:center;gap:5px}
 .sw{width:12px;height:12px;border-radius:3px;display:inline-block}
-.sw.line{background:var(--muted);height:3px;border-radius:2px}.sw.danger{background:var(--danger)}.sw.avgline{background:var(--text);height:2px;border-radius:2px}
-.linechart{width:100%;display:block}
+.sw.line{background:var(--accent);height:0;border-top:2px dashed var(--accent);border-radius:0}.sw.danger{background:var(--danger)}.sw.avgline{background:var(--onsurf);height:2px;border-radius:2px;opacity:.55}
 .heatmap{display:flex;flex-direction:column;gap:3px}
 .heat-week{display:flex;gap:3px}
 .heat-cell{flex:1;aspect-ratio:1;border-radius:4px;background:var(--card2);cursor:pointer;border:none;min-width:0;min-height:13px}
@@ -516,50 +535,84 @@ function Donut({segments,size=116,stroke=16,center}){
     {center!=null&&<div className="donut-center">{center}</div>}
   </div>);
 }
-const DayBars=({data,unit='',color='var(--data)',avg})=>{
-  const vals=avg?avg.filter(v=>v!=null):[];
-  const max=Math.max(...data.map(d=>Math.max(d.value,d.ref||0)),...vals,1);
+function niceMax(v){ if(v<=0)return 1; const p=Math.pow(10,Math.floor(Math.log10(v))); const n=v/p; const s=n<=1?1:n<=1.5?1.5:n<=2?2:n<=3?3:n<=5?5:n<=7?7:10; return s*p; }
+const fmtK=v=>v>=1000?(Math.round(v/100)/10)+'k':String(Math.round(v));
+const DayBars=({data,unit='',color='var(--data)',avg,refLabel='Budget'})=>{
+  const refVal=(data.find(d=>d.ref!=null)||{}).ref;
+  const avgVals=avg?avg.filter(v=>v!=null):[];
+  const rawMax=Math.max(...data.map(d=>Math.max(d.value,d.ref||0)),...avgVals,1);
+  const max=niceMax(rawMax*1.05);
   const n=data.length;
+  const refPct=refVal!=null?(refVal/max)*100:null;
+  const step=n<=14?1:Math.ceil(n/8);
   let poly=null;
   if(avg){const pts=avg.map((v,i)=>v==null?null:`${((i+0.5)/n*100).toFixed(2)},${(100-(v/max)*100).toFixed(2)}`).filter(Boolean);if(pts.length>=2)poly=pts.join(' ');}
-  return (<div className="chart">
-    {data.map(d=>{
-      const h=(d.value/max)*100, refH=d.ref!=null?(d.ref/max)*100:null;
-      return (
-        <div className="chart-col" key={d.key} title={`${d.key}: ${d.value}${unit}`}>
-          <div className="chart-bar-wrap">
-            {refH!=null&&<div className="budget-line" style={{bottom:Math.min(refH,100)+'%'}}/>}
-            <div className={'chart-bar'+(d.over?' over':'')} style={{height:Math.min(h,100)+'%',background:d.over?undefined:color}}/>
-          </div>
-          <div className="chart-label">{d.key.slice(8)}</div>
-        </div>);})}
-    {poly&&<svg className="chart-avg" viewBox="0 0 100 100" preserveAspectRatio="none"><polyline points={poly} fill="none" stroke="var(--text)" strokeWidth="1.5" opacity="0.8" vectorEffect="non-scaling-stroke"/></svg>}
+  return (<div className="bchart">
+    <div className="bchart-yaxis"><span>{fmtK(max)}</span><span>{fmtK(max/2)}</span><span>0</span></div>
+    <div className="bchart-main">
+      <div className="bchart-plot">
+        <div className="bchart-grid">{[0,25,50,75,100].map(y=><i key={y} style={{bottom:y+'%'}}/>)}</div>
+        {refPct!=null&&<div className="bchart-ref" style={{bottom:Math.min(refPct,100)+'%'}}><span>{refLabel} {Math.round(refVal)}</span></div>}
+        <div className="bchart-bars">{data.map(d=>{const h=(d.value/max)*100;return (
+          <div className="bchart-col" key={d.key} title={`${d.key}: ${d.value}${unit}`}>
+            <div className={'bchart-bar'+(d.over?' over':'')} style={{height:Math.max(h,d.value>0?2:0)+'%',background:d.over?undefined:color}}/>
+          </div>);})}</div>
+        {poly&&<svg className="bchart-avg" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <polyline points={poly} fill="none" stroke="var(--card)" strokeWidth="4.5" strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke"/>
+          <polyline points={poly} fill="none" stroke="var(--onsurf)" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" opacity="0.72" vectorEffect="non-scaling-stroke"/></svg>}
+      </div>
+      <div className="bchart-xaxis">{data.map((d,i)=><span key={d.key}>{i%step===0?d.key.slice(8):''}</span>)}</div>
+    </div>
   </div>);
 };
-function LineChart({points,target,unit='kg',height=150}){
-  const vals=points.map(p=>p.value).filter(v=>v!=null);
-  if(!vals.length)return null;
+function LineChart({points,target,unit='kg'}){
+  const idx=points.map((p,i)=>({v:p.value,k:p.key,i})).filter(p=>p.v!=null);
+  if(!idx.length)return null;
+  const vals=idx.map(p=>p.v);
+  const n=points.length;
   const extra=target!=null?[+target]:[];
   let lo=Math.min(...vals,...extra),hi=Math.max(...vals,...extra);
   if(lo===hi){lo-=1;hi+=1;}
-  const pad=(hi-lo)*0.15;lo-=pad;hi+=pad;
-  const W=1000,H=300,n=points.length;
-  const X=i=>n<=1?W/2:i/(n-1)*W;
-  const Y=v=>H-(v-lo)/(hi-lo)*H;
-  const seg=points.map((p,i)=>p.value!=null?`${X(i).toFixed(1)},${Y(p.value).toFixed(1)}`:null).filter(Boolean).join(' ');
-  const ty=target!=null?Y(+target):null;
-  return (<div>
-    <svg className="linechart" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" style={{height}}>
-      {ty!=null&&ty>=0&&ty<=H&&<line x1="0" y1={ty} x2={W} y2={ty} stroke="var(--accent)" strokeWidth="2" strokeDasharray="8 8" vectorEffect="non-scaling-stroke"/>}
-      {seg&&<polyline points={seg} fill="none" stroke="var(--accent2)" strokeWidth="2.5" strokeLinejoin="round" vectorEffect="non-scaling-stroke"/>}
-      {points.map((p,i)=>p.value!=null?<circle key={i} cx={X(i)} cy={Y(p.value)} r="5" fill="var(--accent2)"/>:null)}
-    </svg>
-    <div className="chart-legend">
+  const pad=(hi-lo)*0.2;lo-=pad;hi+=pad;
+  const PADX=4;
+  const xP=i=>n<=1?50:PADX+(i/(n-1))*(100-2*PADX);
+  const yP=v=>(1-(v-lo)/(hi-lo))*100;
+  const line=idx.map(p=>`${xP(p.i).toFixed(2)},${yP(p.v).toFixed(2)}`).join(' ');
+  const area=idx.length>=2?`${xP(idx[0].i).toFixed(2)},100 ${line} ${xP(idx[idx.length-1].i).toFixed(2)},100`:null;
+  const ty=target!=null?yP(+target):null;
+  const fmt=k=>{const[,m,d]=k.split('-');return d+'.'+m+'.';};
+  return (<div className="lc">
+    <div className="lc-plot">
+      <svg className="lc-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <defs><linearGradient id="lcgrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="var(--accent)" stopOpacity="0.24"/><stop offset="100%" stopColor="var(--accent)" stopOpacity="0"/></linearGradient></defs>
+        {[20,40,60,80].map(y=><line key={y} x1="0" y1={y} x2="100" y2={y} stroke="var(--line)" strokeWidth="1" vectorEffect="non-scaling-stroke"/>)}
+        {area&&<polygon points={area} fill="url(#lcgrad)"/>}
+        {ty!=null&&ty>=-1&&ty<=101&&<line x1="0" y1={ty} x2="100" y2={ty} stroke="var(--accent)" strokeWidth="1.5" strokeDasharray="4 3" opacity="0.75" vectorEffect="non-scaling-stroke"/>}
+        {idx.length>=2&&<polyline points={line} fill="none" stroke="var(--accent)" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke"/>}
+      </svg>
+      {idx.map(p=><span key={p.i} className="lc-dot" style={{left:xP(p.i)+'%',top:yP(p.v)+'%'}} title={p.k+': '+p.v+' '+unit}/>)}
+    </div>
+    <div className="lc-xaxis"><span>{fmt(idx[0].k)}</span>{idx.length>1&&<span>{fmt(idx[idx.length-1].k)}</span>}</div>
+    <div className="chart-legend" style={{marginTop:8}}>
       <span>min {Math.round(Math.min(...vals)*10)/10} {unit}</span>
       <span>max {Math.round(Math.max(...vals)*10)/10} {unit}</span>
-      {target!=null&&<span><i className="sw" style={{background:'var(--accent)'}}/> Ziel {target} {unit}</span>}
+      {target!=null&&<span><i className="sw line"/> Ziel {target} {unit}</span>}
     </div>
   </div>);
+}
+function MiniSpark({data,height=46}){
+  const vals=data.map(d=>d.value);
+  if(vals.length<2)return null;
+  let lo=Math.min(...vals),hi=Math.max(...vals); if(lo===hi){lo-=0.5;hi+=0.5;}
+  const pad=(hi-lo)*0.25;lo-=pad;hi+=pad;
+  const n=data.length;
+  const pts=data.map((d,i)=>`${(i/(n-1)*100).toFixed(1)},${((1-(d.value-lo)/(hi-lo))*100).toFixed(1)}`);
+  const area=`0,100 ${pts.join(' ')} 100,100`;
+  return (<svg className="mini-spark" viewBox="0 0 100 100" preserveAspectRatio="none" style={{height}}>
+    <defs><linearGradient id="msg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="var(--accent)" stopOpacity="0.22"/><stop offset="100%" stopColor="var(--accent)" stopOpacity="0"/></linearGradient></defs>
+    <polygon points={area} fill="url(#msg)"/>
+    <polyline points={pts.join(' ')} fill="none" stroke="var(--accent)" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke"/>
+  </svg>);
 }
 function Heatmap({days,profile,goal,onPick,weeks=9}){
   const today=todayKey();
@@ -792,6 +845,12 @@ function Dashboard({state,setState,date,setDate,openImport}){
   const [pick,setPick]=useState(false),[share,setShare]=useState(false);
   const [wInput,setWInput]=useState(n2s(state.weights[date]));
   useEffect(()=>{setWInput(n2s(state.weights[date]));},[date,state.weights]);
+  const wKeys=Object.keys(state.weights).filter(k=>state.weights[k]!=null).sort();
+  const wRecent=wKeys.slice(-14).map(k=>({key:k,value:state.weights[k]}));
+  const wLast=wKeys.length?state.weights[wKeys[wKeys.length-1]]:null;
+  const wDelta=wRecent.length>=2?Math.round((wRecent[wRecent.length-1].value-wRecent[0].value)*10)/10:null;
+  let wGood=null;
+  if(profile.targetWeight!=null&&wDelta!=null&&wDelta!==0){const needDown=profile.targetWeight<wLast;wGood=needDown?wDelta<0:wDelta>0;}
   const macroSegs=[{value:totals.protein*4,color:'var(--protein)'},{value:totals.carbs*4,color:'var(--carbs)'},{value:totals.fat*9,color:'var(--fat)'}];
   return (
     <div className="page page-dash">
@@ -851,6 +910,14 @@ function Dashboard({state,setState,date,setDate,openImport}){
             onKeyDown={e=>{if(e.key==='Enter')e.target.blur();}}/><span>kg</span></div>
           {profile.targetWeight!=null && <span className="muted small">Ziel {profile.targetWeight} kg</span>}
         </div>
+        {wRecent.length>=2 && <div className="weight-trend">
+          <MiniSpark data={wRecent}/>
+          <div className="weight-trend-row">
+            <span className="muted small">{wRecent.length} Messungen · zuletzt {wLast} kg</span>
+            <span className={'wtrend '+(wGood===true?'good':wGood===false?'bad':'flat')}><Icon name={wDelta<0?'trending_down':wDelta>0?'trending_up':'trending_flat'}/> {wDelta>0?'+':''}{wDelta} kg</span>
+          </div>
+        </div>}
+        {wRecent.length<2 && wLast!=null && <p className="muted small" style={{margin:'10px 0 0'}}>Trag an mehreren Tagen dein Gewicht ein – der Verlauf erscheint hier und in der Analyse.</p>}
       </section>
       </div>
       </div>
