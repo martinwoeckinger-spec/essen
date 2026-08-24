@@ -32,6 +32,14 @@ Workflow nötig.
 > Selbst hosten: `index.html` auf beliebigen Webspace legen – oder einfach lokal
 > per Doppelklick öffnen.
 
+## Streamlit-Variante (experimentell)
+
+Als Versuch gibt es zusätzlich eine **Python/Streamlit-Portierung** unter
+[`streamlit/`](streamlit/) – gleiche Berechnungen und derselbe Import, aber als
+Server-App. Start: `cd streamlit && pip install -r requirements.txt &&
+streamlit run streamlit_app.py`. Details in [`streamlit/README.md`](streamlit/README.md).
+Die gepflegte, deployte App bleibt die HTML-Version (`index.html`).
+
 ## Funktionen
 
 - **Erfassung per Copy & Paste** – Tabelle (Tab- oder `|`-getrennt) einfügen;
