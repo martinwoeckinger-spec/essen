@@ -9,3 +9,8 @@ dist-ssr
 .env.*
 screenshots
 *.tsbuildinfo
+
+# Streamlit-Variante: lokale Daten & Python-Artefakte
+streamlit/essen_data.json
+__pycache__
+*.pyc
